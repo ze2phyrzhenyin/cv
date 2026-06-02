@@ -1,0 +1,79 @@
+version: 1
+
+defaults:
+  sandbox: read-only
+  approval: on-request
+  network: disabled
+  allow_commit: false
+  allow_push: false
+  allow_pr: false
+  allow_merge: false
+  allow_deploy: false
+
+levels:
+  L0_read_only:
+    description: Read and inspect files only.
+    sandbox: read-only
+    approval: on-request
+    network: disabled
+    allow_commit: false
+    allow_push: false
+    allow_pr: false
+    allow_merge: false
+    allow_deploy: false
+
+  L1_plan:
+    description: Read-only investigation plus planning output.
+    sandbox: read-only
+    approval: on-request
+    network: disabled
+    allow_commit: false
+    allow_push: false
+    allow_pr: false
+    allow_merge: false
+    allow_deploy: false
+
+  L2_edit:
+    description: Local workspace edits and local validation only.
+    sandbox: workspace-write
+    approval: on-request
+    network: disabled
+    allow_commit: false
+    allow_push: false
+    allow_pr: false
+    allow_merge: false
+    allow_deploy: false
+
+  L3_commit:
+    description: Local commit preparation after explicit approval.
+    sandbox: workspace-write
+    approval: on-request
+    network: disabled
+    allow_commit: true
+    allow_push: false
+    allow_pr: false
+    allow_merge: false
+    allow_deploy: false
+
+  L4_pr:
+    description: Push and PR preparation after explicit approval.
+    sandbox: workspace-write
+    approval: on-request
+    network: disabled
+    allow_commit: true
+    allow_push: false
+    allow_pr: false
+    allow_merge: false
+    allow_deploy: false
+
+  L5_release:
+    description: Release, merge, or deploy gate. Disabled unless explicitly enabled by a human.
+    disabled_by_default: true
+    sandbox: workspace-write
+    approval: on-request
+    network: disabled
+    allow_commit: false
+    allow_push: false
+    allow_pr: false
+    allow_merge: false
+    allow_deploy: false

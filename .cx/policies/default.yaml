@@ -1,0 +1,108 @@
+version: 1
+defaults:
+  intent: general
+  skill: general
+  risk: low
+  sandbox: workspace-write
+  docs_policy: update_if_user_visible
+  tests_policy: run_relevant_tests
+  git_policy: no_push
+
+intents:
+  general:
+    skill: general
+    risk: low
+    sandbox: workspace-write
+    docs_policy: update_if_user_visible
+    tests_policy: run_relevant_tests
+    git_policy: no_push
+
+  bugfix:
+    skill: bugfix
+    risk: medium
+    sandbox: workspace-write
+    docs_policy: update_if_behavior_changes
+    tests_policy: add_or_run_regression_tests
+    git_policy: no_push
+
+  code_review:
+    skill: code_review
+    risk: low
+    sandbox: read-only
+    docs_policy: no_docs_change
+    tests_policy: inspect_existing_tests
+    git_policy: no_git_changes
+
+  add_tests:
+    skill: tests
+    risk: low
+    sandbox: workspace-write
+    docs_policy: no_docs_change
+    tests_policy: add_targeted_tests
+    git_policy: no_push
+
+  docs:
+    skill: docs
+    risk: low
+    sandbox: workspace-write
+    docs_policy: update_requested_docs
+    tests_policy: run_docs_relevant_checks
+    git_policy: no_push
+
+  git_prepare:
+    skill: git_workflow
+    risk: medium
+    sandbox: workspace-write
+    docs_policy: update_if_user_visible
+    tests_policy: run_relevant_tests
+    git_policy: prepare_only_no_push
+
+routing_rules:
+  - name: code_review
+    intent: code_review
+    keywords:
+      - PR
+      - pr
+      - review
+      - 审查
+      - 评审
+      - 有没有坑
+      - 风险
+
+  - name: add_tests
+    intent: add_tests
+    keywords:
+      - 测试
+      - 补测
+      - pytest
+      - test
+      - coverage
+
+  - name: docs
+    intent: docs
+    keywords:
+      - 文档
+      - README
+      - 部署文档
+      - 说明
+      - docs
+
+  - name: git_prepare
+    intent: git_prepare
+    keywords:
+      - 提 PR
+      - 开 PR
+      - pull request
+      - 准备提交
+      - commit
+
+  - name: bugfix
+    intent: bugfix
+    keywords:
+      - 修
+      - bug
+      - 报错
+      - 失效
+      - 异常
+      - broken
+      - fix

@@ -1,0 +1,107 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[margin=20mm, top=16mm, bottom=14mm]{geometry}
+\usepackage{fontspec}
+\usepackage{xeCJK}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{tabularx}
+\usepackage{fontawesome5}
+\usepackage[hidelinks]{hyperref}
+
+\IfFontExistsTF{Times New Roman}{\setmainfont{Times New Roman}}{\setmainfont{TeX Gyre Termes}}
+\IfFontExistsTF{Songti SC}{\setCJKmainfont{Songti SC}}{\IfFontExistsTF{Noto Serif CJK SC}{\setCJKmainfont{Noto Serif CJK SC}}{\setCJKmainfont{FandolSong-Regular}}}
+
+\definecolor{resumeBlue}{HTML}{003B66}
+\definecolor{resumeMuted}{HTML}{58718C}
+\definecolor{resumeRule}{HTML}{D8E1EA}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\tabcolsep}{0pt}
+\linespread{1.08}
+
+\newcommand{\sectionTitle}[1]{%
+  \vspace{12pt}
+  {\large\bfseries\color{resumeBlue}#1}\par
+  \vspace{5pt}
+  {\color{resumeRule}\hrule height 0.7pt}
+  \vspace{6pt}
+}
+
+\newcommand{\entry}[4]{%
+  \begin{tabularx}{\textwidth}{@{}X r@{}}
+    {\bfseries #1} & {\color{resumeMuted}#3} \\
+    {\color{resumeMuted}#2} & {\color{resumeMuted}#4}
+  \end{tabularx}
+  \vspace{4pt}
+}
+
+\newlist{resumeBullets}{itemize}{1}
+\setlist[resumeBullets]{
+  leftmargin=2.1em,
+  label={\color{resumeMuted}—},
+  itemsep=2pt,
+  topsep=1pt,
+  parsep=0pt
+}
+
+\begin{document}
+
+\begin{center}
+  {\fontsize{22pt}{28pt}\selectfont\bfseries\color{resumeBlue}姓名待填写}\par
+  \vspace{6pt}
+  {\large 2026 届应届毕业生 \quad / \quad 求职方向：跨境电商运营}\par
+  \vspace{10pt}
+  {\faMapMarker* \ 现居地待填写 \qquad
+   \faPhone* \ 电话待填写 \qquad
+   \faEnvelope \ 邮箱待填写}
+\end{center}
+
+\sectionTitle{教育背景}
+
+\entry{网络营销与直播电商}{泉州工程职业技术学院}{2022 年 9 月 -- 2026 年 6 月}{2026 届应届毕业生}
+\begin{resumeBullets}
+  \item 系统学习网络营销、新媒体运营、直播电商、电商推广等相关课程，具备内容策划、平台运营及活动执行的基础能力。
+  \item 专业方向与电商运营高度相关，能够较快适应跨境电商岗位中选品推广、内容制作、达人合作及基础运营支持等工作。
+\end{resumeBullets}
+
+\sectionTitle{实践经历}
+
+\entry{小红书运营 / PR 执行}{新媒体运营与品牌推广相关实践}{2024 年 7 月 -- 2025 年 8 月}{}
+\begin{resumeBullets}
+  \item 参与账号近 13 个月日常运营执行，负责内容发布、基础互动维护及数据跟进，账号单月涨粉近 5000，积累了平台内容运营实操经验。
+  \item 参与品牌宣传与产品推广合作，累计对接博主/达人 XX 位，跟进选题沟通、内容发布及合作落地，协助提升产品曝光与内容触达。
+  \item 能够使用 ChatGPT、DeepSeek、豆包等 AI 工具辅助选题发散、标题优化、文案润色及产品卖点梳理，提升内容准备效率。
+\end{resumeBullets}
+
+\vspace{4pt}
+\entry{直播电商带货省赛项目}{省赛项目实践}{2023 年 12 月 -- 2024 年 1 月}{}
+\begin{resumeBullets}
+  \item 参与 1 项直播电商带货省赛项目，系统了解直播带货基础流程、岗位分工及推广执行环节，完成从前期准备到现场配合的项目实践。
+  \item 参与内容策划、活动配合与运营支持，围绕产品卖点梳理、基础话术整理及流程协同完成项目执行，累计参与项目筹备与演练 XX 次。
+\end{resumeBullets}
+
+\sectionTitle{技能}
+
+{\bfseries 平台与运营能力}
+\begin{resumeBullets}
+  \item 小红书账号运营、内容发布、基础互动维护及简单数据复盘
+  \item 了解淘宝网店商品上下架、标题与卖点维护、商品信息整理、库存与价格基础核对等日常运营工作
+  \item 博主 / KOL 对接、合作跟进、品牌宣传与产品推广执行
+  \item 具备基础跨境电商运营理解，可配合站外推广、达人合作、产品卖点整理及运营资料汇总
+\end{resumeBullets}
+
+\vspace{3pt}
+{\bfseries AI 与工具能力}
+\begin{resumeBullets}
+  \item 可使用 ChatGPT、DeepSeek、豆包等 AI 工具辅助资料整理、内容初稿生成、标题优化和活动文案润色
+  \item 会基础 Photoshop 操作，可完成图片裁剪、尺寸调整和简单修图；熟练使用常用办公软件，具备文档、表格及基础信息汇总能力
+\end{resumeBullets}
+
+\vspace{3pt}
+{\bfseries 语言能力}
+\begin{resumeBullets}
+  \item 英语四级，具备基础英文阅读能力，可支持基础跨境电商岗位资料阅读与信息理解
+\end{resumeBullets}
+
+\end{document}

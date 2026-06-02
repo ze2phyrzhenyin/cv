@@ -1,0 +1,162 @@
+version: 1
+
+fallback:
+  intent: read_only_discovery
+  skill: codebase-map
+  mode: read_only
+  sandbox: read-only
+  approval: on-request
+  docs_policy: none
+  tests_policy: none
+  git_policy: none
+  risk_level: low
+  requires_human_approval: []
+
+intents:
+  codebase_map:
+    triggers:
+      - 解释
+      - 看看架构
+      - 项目怎么跑
+      - 模块干嘛
+    skill: codebase-map
+    mode: read_only
+    sandbox: read-only
+    approval: never
+    docs_policy: none
+    tests_policy: none
+    git_policy: none
+    risk_level: low
+    requires_human_approval: []
+
+  bug_fix:
+    triggers:
+      - 修
+      - bug
+      - 报错
+      - 失败
+      - 挂了
+      - broken
+      - 失效
+    skill: bug-fix-minimal
+    mode: plan_then_execute
+    sandbox: workspace-write
+    approval: on-request
+    docs_policy: update_if_user_visible_or_config_changed
+    tests_policy: require_regression
+    git_policy: optional
+    risk_level: medium
+    requires_human_approval: []
+
+  pr_review:
+    triggers:
+      - review
+      - PR
+      - 有没有坑
+      - 检查改动
+      - 代码审查
+    skill: pr-risk-review
+    mode: read_only
+    sandbox: read-only
+    approval: never
+    docs_policy: check_only
+    tests_policy: check_coverage
+    git_policy: none
+    risk_level: low
+    requires_human_approval: []
+
+  docs_update:
+    triggers:
+      - 文档
+      - README
+      - changelog
+      - release notes
+      - 说明
+    skill: docs-update
+    mode: execute
+    sandbox: workspace-write
+    approval: on-request
+    docs_policy: required
+    tests_policy: docs_lint_if_available
+    git_policy: optional
+    risk_level: low
+    requires_human_approval: []
+
+  test_writer:
+    triggers:
+      - 补测试
+      - 写测试
+      - 加用例
+      - 覆盖率
+    skill: test-writer
+    mode: execute
+    sandbox: workspace-write
+    approval: on-request
+    docs_policy: none
+    tests_policy: required
+    git_policy: optional
+    risk_level: low
+    requires_human_approval: []
+
+  feature:
+    triggers:
+      - 加一个功能
+      - 实现
+      - 支持
+      - 新增
+    skill: feature-implementation
+    mode: plan_then_execute
+    sandbox: workspace-write
+    approval: on-request
+    docs_policy: update_if_public_behavior
+    tests_policy: require_new_tests
+    git_policy: optional
+    risk_level: medium
+    requires_human_approval: []
+
+  refactor:
+    triggers:
+      - 重构
+      - 整理代码
+      - 优化结构
+    skill: safe-refactor
+    mode: plan_first
+    sandbox: workspace-write
+    approval: on-request
+    docs_policy: usually_none
+    tests_policy: require_behavior_guard
+    git_policy: optional
+    risk_level: medium
+    requires_human_approval: []
+
+  dependency_upgrade:
+    triggers:
+      - 升级依赖
+      - 升级到最新版
+      - 升到最新版
+      - 迁移版本
+    skill: dependency-upgrade
+    mode: plan_first
+    sandbox: workspace-write
+    approval: on-request
+    docs_policy: update_if_setup_changed
+    tests_policy: require_full_relevant_suite
+    git_policy: optional
+    risk_level: high
+    requires_human_approval: []
+
+  ci_failure:
+    triggers:
+      - CI
+      - workflow failed
+      - action failed
+      - 流水线失败
+    skill: ci-failure-debugger
+    mode: plan_then_execute
+    sandbox: workspace-write
+    approval: on-request
+    docs_policy: none
+    tests_policy: reproduce_failed_check
+    git_policy: optional
+    risk_level: medium
+    requires_human_approval: []

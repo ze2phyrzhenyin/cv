@@ -1,0 +1,23 @@
+profile: strict
+default_base_branch: main
+branch_prefix: codex
+protected_branches:
+- main
+- master
+- develop
+- release
+default_verify_commands:
+- pnpm run typecheck
+- pnpm run test
+skills_dir: null
+policies_dir: null
+prompts_dir: null
+runs_dir: .cx/runs
+github_pr_default_draft: true
+max_ci_fix_iterations: 1
+allow_merge: false
+allow_release: false
+allow_deploy: false
+dangerous_command_patterns: []
+blueprint: resume-tex-mvp
+package_manager: pnpm

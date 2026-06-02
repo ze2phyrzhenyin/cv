@@ -1,0 +1,15 @@
+name: resume-tex-mvp
+version: 0.1.0
+project_type: nextjs-structured-editor
+recommended_profile: strict
+stack:
+  - Next.js
+  - TypeScript
+  - Zod
+  - Vitest
+  - LaTeX template rendering
+non_goals:
+  - Real TeX container compilation in the browser MVP
+  - Payment
+  - Template marketplace
+  - AI resume rewriting

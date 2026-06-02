@@ -1,0 +1,10 @@
+version: 1
+
+branch_prefix: codex
+default_base_branch: main
+pr_default_state: draft
+max_ci_repair_iterations: 2
+codex_may_merge: false
+codex_may_deploy: false
+require_human_approval_before_push: true
+require_human_approval_before_pr: true

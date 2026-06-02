@@ -1,0 +1,17 @@
+version: 1
+
+required_when:
+  - public_api_changed
+  - user_visible_behavior_changed
+  - config_changed
+  - env_var_changed
+  - setup_changed
+  - cli_usage_changed
+  - error_message_changed
+  - database_migration_added
+  - security_permission_changed
+
+defaults:
+  docs_required: false
+  update_scope: directly_related_docs_only
+  avoid_unrelated_rewrites: true

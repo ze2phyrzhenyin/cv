@@ -1,0 +1,29 @@
+version: 1
+
+policies:
+  bug_fix:
+    required:
+      - regression_test
+      - targeted_test
+
+  feature:
+    required:
+      - unit_test
+      - integration_or_e2e_if_user_flow
+
+  refactor:
+    required:
+      - behavior_guard_tests
+
+  docs_only:
+    required:
+      - docs_lint_if_available
+
+  dependency_upgrade:
+    required:
+      - install
+      - lockfile_check
+      - typecheck
+      - lint
+      - build
+      - relevant_suite
