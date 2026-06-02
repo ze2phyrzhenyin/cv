@@ -1,4 +1,4 @@
-profile: strict
+profile: github
 default_base_branch: main
 branch_prefix: codex
 protected_branches:
