@@ -1,6 +1,7 @@
 node_modules
 .next
 .data
+.cx/runs/
 dist
 coverage
 examples/replica/build/
