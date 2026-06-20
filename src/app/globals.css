@@ -796,8 +796,12 @@ button {
 
 .skill-lines p {
   display: grid;
-  gap: 8px;
-  grid-template-columns: 92px 1fr;
+  gap: 12px;
+  grid-template-columns: max-content minmax(0, 1fr);
+}
+
+.skill-lines p span {
+  min-width: 0;
 }
 
 .award-line {

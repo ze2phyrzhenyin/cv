@@ -37,7 +37,7 @@ import type {
 type SectionId = "presentation" | "basics" | "summary" | "experience" | "academic" | "projects" | "education" | "skills" | "source";
 
 const storageKey = "resume-tex-draft-v1";
-const sampleDraftVersion = "zhaoyang-academic-v3";
+const sampleDraftVersion = "zhaoyang-academic-v4";
 const previewPageWidth = 820;
 const previewPageHeight = 1159.7;
 const previewScreenScale = 0.745;
@@ -89,7 +89,11 @@ function isLegacyBundledSample(resume: Partial<ResumeData>): boolean {
     basics?.name === "Zhaoyang SUI" &&
       basics?.email === "zhaoyang.sui@ut-capitole.fr" &&
       academic.some((item) => item.title?.includes("Bie-Modernism")) &&
-      academic.some((item) => !item.authors && !item.publicationStatus && !item.contribution)
+      (academic.some((item) => !item.authors && !item.publicationStatus && !item.contribution) ||
+        searchable.includes("高级语言编程") ||
+        searchable.includes("Advanced programming") ||
+        searchable.includes("Programmation avec des langages avancés") ||
+        searchable.includes("Développement d'algorithmes de conversion"))
   );
 }
 

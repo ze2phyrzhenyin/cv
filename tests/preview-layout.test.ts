@@ -65,6 +65,7 @@ describe("preview layout", () => {
     const languageSource = readFileSync("src/lib/resume-language.ts", "utf-8");
 
     expect(builderSource).toContain("sampleDraftVersion");
+    expect(builderSource).toContain("zhaoyang-academic-v4");
     expect(builderSource).toContain("isLegacyBundledSample");
     expect(builderSource).toContain("draftVersion: sampleDraftVersion");
     expect(builderSource).toContain("resetToSample");
@@ -99,5 +100,16 @@ describe("preview layout", () => {
     expect(globalCss).toContain("line-height: 1.38;");
     expect(globalCss).toContain("padding: 40px 48px;");
     expect(globalCss).toContain(".draft-page-warning");
+  });
+
+  it("keeps the bundled multilingual sample concise enough for one-page output", () => {
+    const fixtureSource = readFileSync("src/lib/fixtures.ts", "utf-8");
+    const globalCss = readFileSync("src/app/globals.css", "utf-8");
+
+    expect(fixtureSource).not.toContain("Programmation avec des langages avancés");
+    expect(fixtureSource).not.toContain("Développement d'algorithmes de conversion de formats de fichiers");
+    expect(fixtureSource).toContain("Conversion .xml/.xsd avec récursivité");
+    expect(fixtureSource).toContain("Deep learning, fine-tuning LLM, RAG");
+    expect(globalCss).toContain("grid-template-columns: max-content minmax(0, 1fr);");
   });
 });
