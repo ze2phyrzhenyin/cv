@@ -67,7 +67,7 @@ levels:
     allow_deploy: false
 
   L5_release:
-    description: Release, merge, or deploy gate. Disabled unless explicitly enabled by a human.
+    description: Release or merge gate. Disabled unless explicitly enabled by a human.
     disabled_by_default: true
     sandbox: workspace-write
     approval: on-request
@@ -77,3 +77,16 @@ levels:
     allow_pr: false
     allow_merge: false
     allow_deploy: false
+
+  L5_deploy:
+    description: Remote deploy/upload gate. Enabled only after explicit user request and secret-safe command review.
+    disabled_by_default: true
+    sandbox: workspace-write
+    approval: on-request
+    network: enabled
+    allow_commit: false
+    allow_push: false
+    allow_pr: false
+    allow_merge: false
+    allow_deploy: true
+    secret_policy: do_not_read_print_commit_or_copy_secrets

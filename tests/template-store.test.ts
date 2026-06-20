@@ -28,19 +28,20 @@ afterEach(async () => {
 });
 
 describe("template store", () => {
-  it("seeds built-in templates and exposes template components", async () => {
+  it("seeds the unified template and exposes template components", async () => {
     const templates = await listTemplateMetas();
-    const ecommerce = await readTemplatePackage("cross-border-ecommerce");
+    const unified = await readTemplatePackage("unified-cv");
 
-    expect(templates.some((template) => template.id === "cross-border-ecommerce")).toBe(true);
-    expect(ecommerce?.components.map((component) => component.kind)).toContain("skills");
+    expect(templates.map((template) => template.id)).toEqual(["unified-cv"]);
+    expect(unified?.components.map((component) => component.kind)).toContain("header");
   });
 
-  it("renders operation templates with stored component conventions", () => {
-    const tex = generateLatex(sampleResume, getTemplate("cross-border-ecommerce"));
+  it("maps older saved template ids to the unified template", async () => {
+    const legacyPackage = await readTemplatePackage("older-saved-template");
+    const tex = generateLatex(sampleResume, getTemplate("older-saved-template"));
 
-    expect(tex).toContain("\\sectionTitle{教育背景}");
-    expect(tex).toContain("\\newlist{resumeBullets}");
-    expect(tex).toContain("\\faPhone");
+    expect(legacyPackage?.meta.id).toBe("unified-cv");
+    expect(tex).toContain("\\resumeSection{教育}");
+    expect(tex).toContain("\\begin{itemize}[leftmargin=*, label={-}");
   });
 });

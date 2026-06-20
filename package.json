@@ -3,15 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "prebuild": "node scripts/copy-pdf-worker.mjs",
+    "predev": "node scripts/copy-pdf-worker.mjs",
     "dev": "next dev",
     "build": "next build",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "publish:all": "node scripts/publish-all.mjs",
     "worker:compile": "tsx scripts/compile-worker.ts",
     "worker:once": "tsx scripts/compile-worker.ts --once"
   },
   "dependencies": {
     "next": "^14.2.0",
+    "pdfjs-dist": "4.10.38",
+    "playwright-core": "1.57.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "zod": "^3.23.0"

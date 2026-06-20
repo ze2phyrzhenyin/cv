@@ -30,14 +30,14 @@ describe("resume store", () => {
     const first = await saveResumeVersion({
       title: "测试简历",
       resume: sampleResume,
-      templateId: "modern-tech",
+      templateId: "unified-cv",
       sourceTex: "v1"
     });
     const second = await saveResumeVersion({
       resumeId: first.resume.id,
       title: "测试简历",
       resume: { ...sampleResume, summary: "updated" },
-      templateId: "ats-classic",
+      templateId: "unified-cv",
       sourceTex: "v2"
     });
 
@@ -54,7 +54,7 @@ describe("resume store", () => {
     const saved = await saveResumeVersion({
       title: "测试简历",
       resume: sampleResume,
-      templateId: "modern-tech",
+      templateId: "unified-cv",
       sourceTex: "v1"
     });
 

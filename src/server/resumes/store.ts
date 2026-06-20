@@ -1,6 +1,7 @@
 import { mkdir, readFile, readdir, rename, writeFile } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 
+import { normalizeTemplateId } from "../../lib/templates";
 import type { ResumeData, ResumeVersion, SavedResumeDetail, SavedResumeSummary, TemplateId } from "../../types/resume";
 import { resumeDataRoot, resumeFile } from "./paths";
 
@@ -22,7 +23,7 @@ export async function listResumes(): Promise<SavedResumeSummary[]> {
   const resumes = await Promise.all(
     files
       .filter((file) => file.endsWith(".json"))
-      .map(async (file) => toSummary(JSON.parse(await readFile(`${resumeDataRoot()}/${file}`, "utf-8")) as SavedResumeDetail))
+      .map(async (file) => toSummary(normalizeSavedResumeDetail(JSON.parse(await readFile(`${resumeDataRoot()}/${file}`, "utf-8")) as SavedResumeDetail)))
   );
 
   return resumes.sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
@@ -31,7 +32,7 @@ export async function listResumes(): Promise<SavedResumeSummary[]> {
 export async function readResume(resumeId: string): Promise<SavedResumeDetail | null> {
   await ensureStore();
   try {
-    return JSON.parse(await readFile(resumeFile(resumeId), "utf-8")) as SavedResumeDetail;
+    return normalizeSavedResumeDetail(JSON.parse(await readFile(resumeFile(resumeId), "utf-8")) as SavedResumeDetail);
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
       return null;
@@ -108,5 +109,16 @@ function toSummary(detail: SavedResumeDetail): SavedResumeSummary {
     versionCount: detail.versions.length,
     createdAt: detail.createdAt,
     updatedAt: detail.updatedAt
+  };
+}
+
+function normalizeSavedResumeDetail(detail: SavedResumeDetail): SavedResumeDetail {
+  return {
+    ...detail,
+    currentTemplateId: normalizeTemplateId(detail.currentTemplateId),
+    versions: detail.versions.map((version) => ({
+      ...version,
+      templateId: normalizeTemplateId(version.templateId)
+    }))
   };
 }

@@ -1,4 +1,7 @@
-import type { ProjectItem, ResumeData, TemplateMeta, TimelineItem } from "@/types/resume";
+import type { BasicField, ProjectItem, ResumeData, ResumeSectionId, TemplateMeta, TimelineItem } from "@/types/resume";
+import { parseInlineFormat } from "./inline-format";
+import type { InlineFormat } from "./inline-format";
+import { getBasicFieldLabelText, getBasicFieldPlacement, getResumeAccentColor, normalizeResumeLanguage } from "./resume-language";
 
 const latexEscapeMap: Record<string, string> = {
   "\\": "\\textbackslash{}",
@@ -13,16 +16,24 @@ const latexEscapeMap: Record<string, string> = {
   "^": "\\textasciicircum{}"
 };
 
-export function escapeLatex(input: string): string {
-  return input.replace(/[\\{}$&#_%~^]/g, (char) => latexEscapeMap[char] ?? char);
+export function escapeLatex(input: string | null | undefined): string {
+  return (input ?? "").replace(/[\\{}$&#_%~^]/g, (char) => latexEscapeMap[char] ?? char);
 }
 
 function cleanLines(lines: string[]): string[] {
   return lines.map((line) => line.trim()).filter(Boolean);
 }
 
-function joinContact(items: string[]): string {
-  return cleanLines(items).map(escapeLatex).join(" $\\cdot$ ");
+function chunkFields(fields: BasicField[]): BasicField[][] {
+  if (fields.length <= 3) {
+    return [fields];
+  }
+
+  const rows = [fields.slice(0, 3)];
+  for (let index = 3; index < fields.length; index += 2) {
+    rows.push(fields.slice(index, index + 2));
+  }
+  return rows;
 }
 
 function renderHighlights(highlights: string[]): string {
@@ -32,8 +43,8 @@ function renderHighlights(highlights: string[]): string {
   }
 
   return [
-    "\\begin{itemize}[leftmargin=*, itemsep=1pt, topsep=2pt]",
-    ...lines.map((line) => `  \\item ${escapeLatex(line)}`),
+    "\\begin{itemize}[leftmargin=*, label={-}, itemsep=2pt, topsep=2pt]",
+    ...lines.map((line) => `  \\item ${renderInlineLatex(line)}`),
     "\\end{itemize}"
   ].join("\n");
 }
@@ -42,9 +53,9 @@ function renderTimeline(items: TimelineItem[]): string {
   return items
     .map((item) => {
       const dates = cleanLines([item.startDate, item.endDate]).join(" -- ");
-      const meta = cleanLines([dates, item.location]).map(escapeLatex).join(" \\quad ");
+      const meta = cleanLines([dates, item.location]).map(renderInlineLatex).join(" \\quad ");
       return [
-        `\\resumeEntry{${escapeLatex(item.organization)}}{${escapeLatex(item.role)}}{${meta}}`,
+        `\\resumeEntry{${renderInlineLatex(item.organization)}}{${renderInlineLatex(item.role)}}{${meta}}`,
         renderHighlights(item.highlights)
       ]
         .filter(Boolean)
@@ -56,9 +67,9 @@ function renderTimeline(items: TimelineItem[]): string {
 function renderProjects(items: ProjectItem[]): string {
   return items
     .map((item) => {
-      const meta = cleanLines([item.role, item.techStack, item.url]).map(escapeLatex).join(" \\quad ");
+      const meta = cleanLines([item.role, item.techStack]).map(renderInlineLatex).join(" \\quad ");
       return [
-        `\\resumeEntry{${escapeLatex(item.name)}}{${meta}}{}`,
+        `\\resumeEntry{${renderInlineLatex(item.name)}}{${meta}}{${renderInlineLatex(item.url)}}`,
         renderHighlights(item.highlights)
       ]
         .filter(Boolean)
@@ -72,198 +83,138 @@ function renderSection(title: string, body: string): string {
     return "";
   }
 
-  return [`\\section*{${escapeLatex(title)}}`, body].join("\n");
+  return [`\\resumeSection{${escapeLatex(title)}}`, body].join("\n");
 }
 
-function accentDefinition(template: TemplateMeta): string {
-  return `\\definecolor{ResumeAccent}{HTML}{${template.accentColor.replace("#", "")}}`;
+function accentDefinition(resume: ResumeData, template: TemplateMeta): string {
+  return `\\definecolor{ResumeAccent}{HTML}{${getResumeAccentColor(resume, template).replace("#", "")}}`;
 }
 
 export function generateLatex(resume: ResumeData, template: TemplateMeta): string {
-  if (template.layout === "operation") {
-    return generateOperationLatex(resume, template);
-  }
+  const data = normalizeResumeLanguage(resume);
 
-  const contact = joinContact([
-    resume.basics.email,
-    resume.basics.phone,
-    resume.basics.location,
-    resume.basics.website,
-    resume.basics.github,
-    resume.basics.linkedin
-  ]);
-  const skillLines = resume.skills
+  const skillLines = data.skills
     .filter((group) => group.category.trim() || group.items.some(Boolean))
     .map((group) => {
-      const items = cleanLines(group.items).map(escapeLatex).join(", ");
-      return `\\textbf{${escapeLatex(group.category)}}: ${items}\\\\`;
+      const items = cleanLines(group.items).map(renderInlineLatex).join(", ");
+      return `\\textbf{${renderInlineLatex(group.category)}}: ${items}\\\\`;
     })
     .join("\n");
-  const awardLines = resume.awards
+  const awardLines = data.awards
     .map((award) => {
-      const meta = cleanLines([award.issuer, award.date]).map(escapeLatex).join(" \\quad ");
-      return `\\resumeEntry{${escapeLatex(award.title)}}{${meta}}{}`;
+      const meta = cleanLines([award.issuer, award.date]).map(renderInlineLatex).join(" \\quad ");
+      return `\\resumeEntry{${renderInlineLatex(award.title)}}{${meta}}{}`;
     })
     .join("\n");
-  const headerRule = template.id === "ats-classic" ? "\\vspace{2pt}\\hrule\\vspace{6pt}" : "\\color{ResumeAccent}\\rule{\\textwidth}{1.2pt}\\color{black}";
+  const sectionBodies: Record<ResumeSectionId, string> = {
+    basics: "",
+    summary: renderInlineLatex(data.summary),
+    experience: renderTimeline(data.experience),
+    projects: renderProjects(data.projects),
+    education: renderTimeline(data.education),
+    skillsAwards: [skillLines, awardLines].filter(Boolean).join("\n\n")
+  };
+  const sections = data.sections
+    .filter((section) => section.visible)
+    .map((section) => (section.id === "basics" ? renderBasicInfo(data.basicFields) : renderSection(section.title, sectionBodies[section.id])))
+    .filter(Boolean);
 
   return [
-    "\\documentclass[10pt,a4paper]{article}",
-    "\\usepackage[margin=1.35cm]{geometry}",
+    "\\documentclass[11pt,a4paper]{article}",
+    "\\usepackage[margin=1.45cm]{geometry}",
     "\\usepackage{fontspec}",
-    "\\usepackage{xeCJK}",
     "\\usepackage{xcolor}",
     "\\usepackage{enumitem}",
+    "\\usepackage[normalem]{ulem}",
     "\\usepackage[hidelinks]{hyperref}",
-    "\\IfFontExistsTF{TeX Gyre Heros}{\\setmainfont{TeX Gyre Heros}}{\\setmainfont{Helvetica}}",
-    "\\IfFontExistsTF{Noto Sans CJK SC}{\\setCJKmainfont{Noto Sans CJK SC}}{\\IfFontExistsTF{PingFang SC}{\\setCJKmainfont{PingFang SC}}{\\setCJKmainfont{FandolSong-Regular}}}",
+    "\\IfFontExistsTF{Songti SC}{\\setmainfont{Songti SC}}{\\IfFontExistsTF{Noto Serif CJK SC}{\\setmainfont{Noto Serif CJK SC}}{\\IfFontExistsTF{Noto Sans CJK SC}{\\setmainfont{Noto Sans CJK SC}}{\\IfFontExistsTF{FandolSong-Regular}{\\setmainfont{FandolSong-Regular}}{\\setmainfont{TeX Gyre Termes}}}}}",
     "\\pagestyle{empty}",
     "\\setlength{\\parindent}{0pt}",
+    "\\setlength{\\parskip}{3pt}",
     "\\setlist[itemize]{noitemsep}",
-    accentDefinition(template),
+    "\\XeTeXlinebreaklocale \"zh\"",
+    "\\XeTeXlinebreakskip=0pt plus 1pt",
+    "\\emergencystretch=2em",
+    "\\sloppy",
+    accentDefinition(data, template),
+    "\\newcommand{\\resumeSection}[1]{%",
+    "  \\vspace{7pt}{\\large\\bfseries\\color{ResumeAccent}#1}\\par\\vspace{2pt}{\\color{ResumeAccent!28}\\hrule height 0.4pt}\\vspace{4pt}",
+    "}",
     "\\newcommand{\\resumeEntry}[3]{%",
     "  \\textbf{#1}\\hfill {\\small #3}\\\\",
     "  {\\small #2}\\vspace{2pt}",
     "}",
     "\\begin{document}",
-    `\\begin{center}{\\LARGE\\textbf{${escapeLatex(resume.basics.name)}}}\\\\`,
-    `\\vspace{3pt}{\\large ${escapeLatex(resume.basics.title)}}\\\\`,
-    `\\vspace{3pt}{\\small ${contact}}\\end{center}`,
-    headerRule,
-    renderSection("个人简介", escapeLatex(resume.summary)),
-    renderSection("工作经历", renderTimeline(resume.experience)),
-    renderSection("项目经历", renderProjects(resume.projects)),
-    renderSection("教育经历", renderTimeline(resume.education)),
-    renderSection("技能", skillLines),
-    renderSection("奖项", awardLines),
+    ...sections,
     "\\end{document}"
   ]
     .filter((line) => line.trim().length > 0)
     .join("\n\n");
 }
 
-function generateOperationLatex(resume: ResumeData, template: TemplateMeta): string {
-  const contactParts = [
-    ["\\faMapMarker*", resume.basics.location || "现居地待填写"],
-    ["\\faPhone*", resume.basics.phone || "电话待填写"],
-    ["\\faEnvelope", resume.basics.email || "邮箱待填写"]
-  ];
-  const education = renderOperationTimeline(resume.education);
-  const practice = [renderOperationTimeline(resume.experience), renderOperationProjects(resume.projects)].filter(Boolean).join("\n\n\\vspace{3pt}\n");
-  const skills = renderOperationSkills(resume);
-  const awards = resume.awards
-    .map((award) => {
-      const meta = cleanLines([award.issuer, award.date]).map(escapeLatex).join(" \\quad ");
-      return `\\entry{${escapeLatex(award.title)}}{${meta}}{}{}`
-    })
-    .join("\n");
+function renderBasicInfo(fields: BasicField[]): string {
+  const name = fields.find((field) => getBasicFieldPlacement(field) === "name" && field.value.trim())?.value.trim() ?? "";
+  const headlines = fields.filter((field) => getBasicFieldPlacement(field) === "headline" && field.value.trim());
+  const details = fields
+    .filter((field) => getBasicFieldPlacement(field) === "contact" && field.value.trim());
+  const detailRows = chunkFields(details)
+    .map((row) =>
+      row
+        .map(renderInlineBasicField)
+        .filter(Boolean)
+        .join(" \\quad \\textcolor{black!45}{|} \\quad ")
+    )
+    .filter(Boolean)
+    .join("\\\\[2pt]\n");
+  const body = [
+    name ? `{\\Huge\\bfseries\\color{ResumeAccent}${renderInlineLatex(name)}}\\\\[-1pt]` : "",
+    ...headlines.map((field, index) => {
+      const spacing = index === headlines.length - 1 ? "4pt" : "1pt";
+      return `{\\large ${renderInlineBasicField(field)}}\\\\[${spacing}]`;
+    }),
+    detailRows ? `{\\small ${detailRows}}` : ""
+  ].filter(Boolean);
+
+  if (body.length === 0) {
+    return "";
+  }
 
   return [
-    "\\documentclass[10pt,a4paper]{article}",
-    "\\usepackage[margin=20mm, top=16mm, bottom=14mm]{geometry}",
-    "\\usepackage{fontspec}",
-    "\\usepackage{xeCJK}",
-    "\\usepackage{xcolor}",
-    "\\usepackage{enumitem}",
-    "\\usepackage{tabularx}",
-    "\\usepackage{fontawesome5}",
-    "\\usepackage[hidelinks]{hyperref}",
-    "\\IfFontExistsTF{Times New Roman}{\\setmainfont{Times New Roman}}{\\setmainfont{TeX Gyre Termes}}",
-    "\\IfFontExistsTF{Songti SC}{\\setCJKmainfont{Songti SC}}{\\IfFontExistsTF{Noto Serif CJK SC}{\\setCJKmainfont{Noto Serif CJK SC}}{\\setCJKmainfont{FandolSong-Regular}}}",
-    `\\definecolor{resumeBlue}{HTML}{${template.accentColor.replace("#", "")}}`,
-    "\\definecolor{resumeMuted}{HTML}{58718C}",
-    "\\definecolor{resumeRule}{HTML}{D8E1EA}",
-    "\\pagestyle{empty}",
-    "\\setlength{\\parindent}{0pt}",
-    "\\setlength{\\tabcolsep}{0pt}",
-    "\\linespread{1.08}",
-    "\\newcommand{\\sectionTitle}[1]{%",
-    "  \\vspace{12pt}",
-    "  {\\large\\bfseries\\color{resumeBlue}#1}\\par",
-    "  \\vspace{5pt}",
-    "  {\\color{resumeRule}\\hrule height 0.7pt}",
-    "  \\vspace{6pt}",
-    "}",
-    "\\newcommand{\\entry}[4]{%",
-    "  \\begin{tabularx}{\\textwidth}{@{}X r@{}}",
-    "    {\\bfseries #1} & {\\color{resumeMuted}#3} \\\\",
-    "    {\\color{resumeMuted}#2} & {\\color{resumeMuted}#4}",
-    "  \\end{tabularx}",
-    "  \\vspace{4pt}",
-    "}",
-    "\\newlist{resumeBullets}{itemize}{1}",
-    "\\setlist[resumeBullets]{leftmargin=2.1em, label={\\color{resumeMuted}—}, itemsep=2pt, topsep=1pt, parsep=0pt}",
-    "\\begin{document}",
     "\\begin{center}",
-    `  {\\fontsize{22pt}{28pt}\\selectfont\\bfseries\\color{resumeBlue}${escapeLatex(resume.basics.name || "姓名待填写")}}\\par`,
-    "  \\vspace{6pt}",
-    `  {\\large ${escapeLatex(resume.basics.title || "2026 届应届毕业生 / 求职方向：跨境电商运营")}}\\par`,
-    "  \\vspace{10pt}",
-    `  {${contactParts.map(([icon, value]) => `${icon} \\ ${escapeLatex(value)}`).join(" \\qquad ")}}`,
+    ...body,
     "\\end{center}",
-    renderOperationSection("教育背景", education),
-    renderOperationSection("实践经历", practice),
-    renderOperationSection("技能", skills),
-    renderOperationSection("奖项", awards),
-    "\\end{document}"
-  ]
-    .filter((line) => line.trim().length > 0)
-    .join("\n\n");
-}
-
-function renderOperationSection(title: string, body: string): string {
-  if (!body.trim()) {
-    return "";
-  }
-  return [`\\sectionTitle{${escapeLatex(title)}}`, body].join("\n\n");
-}
-
-function renderOperationTimeline(items: TimelineItem[]): string {
-  return items
-    .map((item) => {
-      const dates = cleanLines([item.startDate, item.endDate]).join(" -- ");
-      return [
-        `\\entry{${escapeLatex(item.role)}}{${escapeLatex(item.organization)}}{${escapeLatex(dates)}}{${escapeLatex(item.location)}}`,
-        renderOperationHighlights(item.highlights)
-      ].join("\n");
-    })
-    .join("\n\n\\vspace{3pt}\n");
-}
-
-function renderOperationProjects(items: ProjectItem[]): string {
-  return items
-    .map((item) => {
-      const meta = cleanLines([item.role, item.techStack]).join(" / ");
-      return [
-        `\\entry{${escapeLatex(item.name)}}{${escapeLatex(meta)}}{${escapeLatex(item.url)}}{}`,
-        renderOperationHighlights(item.highlights)
-      ].join("\n");
-    })
-    .join("\n\n\\vspace{3pt}\n");
-}
-
-function renderOperationHighlights(highlights: string[]): string {
-  const lines = cleanLines(highlights);
-  if (lines.length === 0) {
-    return "";
-  }
-  return [
-    "\\begin{resumeBullets}",
-    ...lines.map((line) => `  \\item ${escapeLatex(line)}`),
-    "\\end{resumeBullets}"
+    "\\vspace{-2pt}",
+    "{\\color{ResumeAccent}\\hrule height 0.8pt}",
+    "\\vspace{5pt}"
   ].join("\n");
 }
 
-function renderOperationSkills(resume: ResumeData): string {
-  return resume.skills
-    .filter((group) => group.category.trim() || group.items.some(Boolean))
-    .map((group) =>
-      [
-        `{\\bfseries ${escapeLatex(group.category)}}`,
-        "\\begin{resumeBullets}",
-        ...cleanLines(group.items).map((item) => `  \\item ${escapeLatex(item)}`),
-        "\\end{resumeBullets}"
-      ].join("\n")
-    )
-    .join("\n\n\\vspace{2pt}\n");
+function renderInlineBasicField(field: BasicField): string {
+  const label = getBasicFieldLabelText(field);
+  const value = renderInlineLatex(field.value.trim());
+  if (!value) {
+    return "";
+  }
+  return label ? `\\textbf{${escapeLatex(label)}} ${value}` : value;
+}
+
+function renderInlineLatex(value: string): string {
+  return parseInlineFormat(value)
+    .map((segment) => applyLatexFormats(escapeLatex(segment.text), segment.formats))
+    .join("");
+}
+
+function applyLatexFormats(value: string, formats: InlineFormat[]): string {
+  return [...formats].reverse().reduce((next, format) => {
+    switch (format) {
+      case "bold":
+        return `\\textbf{${next}}`;
+      case "italic":
+        return `\\textit{${next}}`;
+      case "underline":
+        return `\\uline{${next}}`;
+      case "strike":
+        return `\\sout{${next}}`;
+    }
+  }, value);
 }

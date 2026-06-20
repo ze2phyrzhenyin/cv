@@ -10,7 +10,7 @@ Requirements:
 
 - `latexmk`
 - `xelatex`
-- CJK font support, preferably Noto Sans CJK, PingFang SC, or Fandol
+- CJK font support, preferably Songti SC, Noto Serif CJK SC, Noto Sans CJK, PingFang SC, or Fandol
 
 ## Docker Mode
 

@@ -1,10 +1,18 @@
-export type TemplateId =
-  | "modern-tech"
-  | "academic-clean"
-  | "ats-classic"
-  | "cross-border-ecommerce"
-  | "campus-operations"
-  | "product-marketing";
+export type TemplateId = "unified-cv";
+
+export type ResumeLanguage = "zh-CN" | "en" | "fr";
+
+export type ResumeSectionId = "basics" | "summary" | "experience" | "projects" | "education" | "skillsAwards";
+
+export type ResumeSectionConfig = {
+  id: ResumeSectionId;
+  title: string;
+  visible: boolean;
+};
+
+export type ResumeTheme = {
+  accentColor: string;
+};
 
 export type Basics = {
   name: string;
@@ -15,6 +23,23 @@ export type Basics = {
   website: string;
   github: string;
   linkedin: string;
+};
+
+export type BasicFieldPlacement = "name" | "headline" | "contact" | "hidden";
+
+export type BasicFieldLabelMode = "text" | "mark" | "custom" | "none";
+
+export type BasicFieldLabelIcon = "email" | "phone" | "location" | "website" | "github" | "linkedin" | "link";
+
+export type BasicField = {
+  id: string;
+  label: string;
+  value: string;
+  key?: keyof Basics;
+  placement?: BasicFieldPlacement;
+  labelMode?: BasicFieldLabelMode;
+  labelMark?: string;
+  labelIcon?: BasicFieldLabelIcon;
 };
 
 export type TimelineItem = {
@@ -50,6 +75,10 @@ export type AwardItem = {
 };
 
 export type ResumeData = {
+  language: ResumeLanguage;
+  theme: ResumeTheme;
+  sections: ResumeSectionConfig[];
+  basicFields: BasicField[];
   basics: Basics;
   summary: string;
   education: TimelineItem[];
@@ -63,14 +92,13 @@ export type TemplateMeta = {
   id: TemplateId;
   name: string;
   category: string;
-  language: "zh-CN" | "en";
+  language: ResumeLanguage;
   engine: "xelatex";
-  layout: "compact" | "classic" | "ats" | "operation";
+  layout: "unified";
   accentColor: string;
   description: string;
   supports: {
     chinese: boolean;
-    atsMode: boolean;
     avatar: boolean;
   };
 };

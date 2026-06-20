@@ -17,7 +17,7 @@ github_pr_default_draft: true
 max_ci_fix_iterations: 1
 allow_merge: false
 allow_release: false
-allow_deploy: false
+allow_deploy: true
 dangerous_command_patterns: []
 blueprint: resume-tex-mvp
 package_manager: pnpm

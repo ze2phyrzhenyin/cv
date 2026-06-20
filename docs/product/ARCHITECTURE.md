@@ -5,7 +5,8 @@
 ```text
 Next.js App Router
   ├─ structured resume editor
-  ├─ template selector
+  ├─ unified layout controls
+  ├─ language switcher
   ├─ A4 draft preview renderer
   ├─ compiled PDF iframe preview
   ├─ LaTeX source editor/export
@@ -24,6 +25,7 @@ API routes
 Core libs
   ├─ Resume JSON types
   ├─ Zod validation
+  ├─ resume language/display normalization
   ├─ LaTeX escaping
   ├─ LaTeX template rendering
   └─ resume quality checks
@@ -58,19 +60,14 @@ Saved resumes are file-backed during the MVP:
 
 Each save appends an immutable version. Compile jobs can carry `resumeId` and `versionId`; when the Worker succeeds it stores the generated `pdfJobId` and `pdfUrl` back on that version.
 
-Template packages are also file-backed:
+Template packages are also file-backed as an internal compatibility layer. The current frontend and template API expose one unified CV layout instead of template selection:
 
 ```text
 .data/templates/
-  modern-tech.json
-  academic-clean.json
-  ats-classic.json
-  cross-border-ecommerce.json
-  campus-operations.json
-  product-marketing.json
+  unified-cv.json
 ```
 
-Each package stores `meta`, `tags`, and reusable LaTeX components such as preamble, header, section, entry, bullets, and skills. Built-in templates are seeded only when missing so local template edits are not overwritten.
+The package stores `meta`, `tags`, and reusable LaTeX components such as preamble, header, entry, and bullets. Legacy template IDs are accepted by request validation and mapped to `unified-cv`.
 
 ## Next Phase
 

@@ -13,7 +13,7 @@ describe("analyzeResume", () => {
   it("flags missing contact data", () => {
     const issues = analyzeResume({
       ...sampleResume,
-      basics: { ...sampleResume.basics, email: "", phone: "" }
+      basicFields: sampleResume.basicFields.map((field) => (field.key === "email" || field.key === "phone" ? { ...field, value: "" } : field))
     });
 
     expect(issues.some((issue) => issue.message.includes("联系方式"))).toBe(true);

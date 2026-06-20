@@ -1,11 +1,12 @@
 import { constants } from "node:fs";
-import { access, copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { access, copyFile, mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { spawn } from "node:child_process";
 
 import { artifactPdfPath, workspacePath } from "./paths";
 import { readCompileJob, updateCompileJob } from "./job-store";
 import { attachCompilePdf } from "../resumes/store";
+import { renderResumePdf } from "./html-pdf";
 
 type CommandResult = {
   code: number | null;
@@ -38,20 +39,9 @@ export async function processCompileJob(jobId: string): Promise<void> {
     await mkdir(buildDir, { recursive: true });
     await writeFile(path.join(workspace, "main.tex"), job.sourceTex, "utf-8");
 
-    const commandResult =
-      compileMode() === "docker" ? await runDockerLatex(workspace) : await runLocalLatex(workspace);
-
-    const log = truncateLog([commandResult.stdout, commandResult.stderr].filter(Boolean).join("\n"));
-
-    if (commandResult.timedOut) {
-      await failJob(jobId, "LaTeX 编译超时。", log);
-      return;
-    }
-
-    if (commandResult.code !== 0) {
-      await failJob(jobId, parseLatexError(log), log);
-      return;
-    }
+    const mode = compileMode();
+    const log =
+      mode === "browser" ? await renderResumePdf(job, outputPdf, workspace) : await compileLatexToPdf(workspace, mode);
 
     await access(outputPdf, constants.R_OK);
     await copyFile(outputPdf, finalPdf);
@@ -66,7 +56,7 @@ export async function processCompileJob(jobId: string): Promise<void> {
       pdfPath: finalPdf,
       pdfUrl: `/api/compile/${jobId}/pdf`,
       finishedAt: new Date().toISOString(),
-      log: log || "LaTeX compile completed."
+      log: log || "PDF compile completed."
     });
   } catch (error) {
     await failJob(jobId, humanError(error), "");
@@ -77,8 +67,29 @@ export async function processCompileJob(jobId: string): Promise<void> {
   }
 }
 
-function compileMode(): "local" | "docker" {
-  return process.env.RESUME_TEX_COMPILE_MODE === "docker" ? "docker" : "local";
+function compileMode(): "browser" | "local" | "docker" {
+  if (process.env.RESUME_TEX_COMPILE_MODE === "docker") {
+    return "docker";
+  }
+  if (process.env.RESUME_TEX_COMPILE_MODE === "local") {
+    return "local";
+  }
+  return "browser";
+}
+
+async function compileLatexToPdf(workspace: string, mode: "local" | "docker"): Promise<string> {
+  const commandResult = mode === "docker" ? await runDockerLatex(workspace) : await runLocalLatex(workspace);
+  const log = truncateLog([commandResult.stdout, commandResult.stderr].filter(Boolean).join("\n"));
+
+  if (commandResult.timedOut) {
+    throw new Error("LaTeX 编译超时。");
+  }
+
+  if (commandResult.code !== 0) {
+    throw new Error(parseLatexError(log));
+  }
+
+  return log || "LaTeX compile completed.";
 }
 
 async function runLocalLatex(workspace: string): Promise<CommandResult> {
@@ -131,14 +142,14 @@ async function runDockerLatex(workspace: string): Promise<CommandResult> {
 }
 
 function runCommand(command: string, args: string[], cwd: string): Promise<CommandResult> {
-  const timeoutMs = Number.parseInt(process.env.RESUME_TEX_COMPILE_TIMEOUT_MS || "15000", 10);
+  const timeoutMs = Number.parseInt(process.env.RESUME_TEX_COMPILE_TIMEOUT_MS || "60000", 10);
 
   return new Promise((resolve) => {
     const child = spawn(command, args, {
       cwd,
       env: {
         ...process.env,
-        openin_any: "p",
+        openin_any: "r",
         openout_any: "p"
       },
       stdio: ["ignore", "pipe", "pipe"]
@@ -209,8 +220,4 @@ function truncateLog(log: string): string {
     return log;
   }
   return `${log.slice(0, maxLogLength)}\n... log truncated ...`;
-}
-
-export async function readPdf(jobId: string): Promise<Buffer> {
-  return readFile(artifactPdfPath(jobId));
 }

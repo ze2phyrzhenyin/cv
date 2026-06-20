@@ -29,7 +29,7 @@ describe("compile job store", () => {
   it("creates queued jobs and lists them in creation order", async () => {
     const first = await createCompileJob({
       resume: sampleResume,
-      templateId: "modern-tech",
+      templateId: "unified-cv",
       sourceTex: "\\documentclass{article}\\begin{document}A\\end{document}",
       issues: [],
       engine: "xelatex",
@@ -37,7 +37,7 @@ describe("compile job store", () => {
     });
     const second = await createCompileJob({
       resume: sampleResume,
-      templateId: "ats-classic",
+      templateId: "unified-cv",
       sourceTex: "\\documentclass{article}\\begin{document}B\\end{document}",
       issues: [],
       engine: "xelatex",
@@ -52,7 +52,7 @@ describe("compile job store", () => {
   it("does not expose resume payload or artifact paths in public responses", async () => {
     const job = await createCompileJob({
       resume: sampleResume,
-      templateId: "modern-tech",
+      templateId: "unified-cv",
       sourceTex: "\\documentclass{article}\\begin{document}A\\end{document}",
       issues: [],
       engine: "xelatex",

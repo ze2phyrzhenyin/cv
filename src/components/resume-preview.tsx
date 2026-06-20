@@ -1,6 +1,18 @@
 import type { CSSProperties } from "react";
+import React from "react";
 
-import type { ResumeData, TemplateMeta } from "@/types/resume";
+import { parseInlineFormat } from "@/lib/inline-format";
+import type { InlineFormat } from "@/lib/inline-format";
+import {
+  getBasicFieldLabelIcon,
+  getBasicFieldLabelMode,
+  getBasicFieldLabelText,
+  getBasicFieldPlacement,
+  getResumeAccentColor,
+  getResumeCopy,
+  normalizeResumeLanguage
+} from "@/lib/resume-language";
+import type { BasicField, BasicFieldLabelIcon, ResumeData, ResumeSectionId, TemplateMeta } from "@/types/resume";
 
 type ResumePreviewProps = {
   resume: ResumeData;
@@ -11,128 +23,198 @@ function clean(values: string[]): string[] {
   return values.map((value) => value.trim()).filter(Boolean);
 }
 
+function cleanInline(values: string[]): string[] {
+  return values.map((value) => value.trim()).filter(Boolean);
+}
+
+function chunkDetails(fields: BasicField[]): BasicField[][] {
+  if (fields.length <= 3) {
+    return [fields];
+  }
+
+  return [fields.slice(0, 3), fields.slice(3)];
+}
+
 function DateLine({ startDate, endDate, location }: { startDate: string; endDate: string; location: string }) {
-  return <span>{clean([clean([startDate, endDate]).join(" - "), location]).join(" · ")}</span>;
+  return (
+    <span>
+      <InlineJoin values={cleanInline([cleanInline([startDate, endDate]).join(" - "), location])} separator=" · " />
+    </span>
+  );
 }
 
 export function ResumePreview({ resume, template }: ResumePreviewProps) {
+  const data = normalizeResumeLanguage(resume);
+  const copy = getResumeCopy(data);
   const style = {
-    "--resume-accent": template.accentColor
+    "--resume-accent": getResumeAccentColor(data, template)
   } as CSSProperties;
-  const contact = clean([
-    resume.basics.email,
-    resume.basics.phone,
-    resume.basics.location,
-    resume.basics.website,
-    resume.basics.github,
-    resume.basics.linkedin
-  ]);
+  const sectionBodies: Record<ResumeSectionId, React.ReactNode> = {
+    basics: null,
+    summary: <p><InlineText value={data.summary} /></p>,
+    experience: (
+      <>
+        {data.experience.map((item) => (
+          <div className="resume-entry" key={item.id}>
+            <div className="entry-head">
+              <div>
+                <strong><InlineText value={item.organization} /></strong>
+                <span><InlineText value={item.role} /></span>
+              </div>
+              <DateLine startDate={item.startDate} endDate={item.endDate} location={item.location} />
+            </div>
+            <BulletList items={item.highlights} />
+          </div>
+        ))}
+      </>
+    ),
+    projects: (
+      <>
+        {data.projects.map((item) => (
+          <div className="resume-entry" key={item.id}>
+            <div className="entry-head">
+              <div>
+                <strong><InlineText value={item.name} /></strong>
+                <span><InlineJoin values={cleanInline([item.role, item.techStack])} separator=" · " /></span>
+              </div>
+              <span><InlineText value={item.url} /></span>
+            </div>
+            <BulletList items={item.highlights} />
+          </div>
+        ))}
+      </>
+    ),
+    education: (
+      <>
+        {data.education.map((item) => (
+          <div className="resume-entry" key={item.id}>
+            <div className="entry-head">
+              <div>
+                <strong><InlineText value={item.organization} /></strong>
+                <span><InlineText value={item.role} /></span>
+              </div>
+              <DateLine startDate={item.startDate} endDate={item.endDate} location={item.location} />
+            </div>
+            <BulletList items={item.highlights} />
+          </div>
+        ))}
+      </>
+    ),
+    skillsAwards: <SkillsAwards resume={data} />
+  };
 
   return (
     <article className={`resume-page ${template.id}`} style={style}>
-      <header className="resume-header">
-        <div>
-          <h1>{resume.basics.name || "姓名"}</h1>
-          <p>{resume.basics.title || "目标职位"}</p>
-        </div>
-        <ul aria-label="联系方式">
-          {contact.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      </header>
-
-      <ResumeSection title="个人简介" visible={Boolean(resume.summary.trim())}>
-        <p>{resume.summary}</p>
-      </ResumeSection>
-
-      <ResumeSection title="工作经历" visible={resume.experience.length > 0}>
-        {resume.experience.map((item) => (
-          <div className="resume-entry" key={item.id}>
-            <div className="entry-head">
-              <div>
-                <strong>{item.organization}</strong>
-                <span>{item.role}</span>
-              </div>
-              <DateLine startDate={item.startDate} endDate={item.endDate} location={item.location} />
-            </div>
-            <BulletList items={item.highlights} />
-          </div>
+      {data.sections
+        .filter((section) => section.visible && hasSectionContent(data, section.id))
+        .map((section) => (
+          section.id === "basics" ? (
+            <ResumeHeader key={section.id} ariaLabel={copy.contactAria} fields={data.basicFields} />
+          ) : (
+            <ResumeSection key={section.id} title={section.title}>
+              {sectionBodies[section.id]}
+            </ResumeSection>
+          )
         ))}
-      </ResumeSection>
-
-      <ResumeSection title="项目经历" visible={resume.projects.length > 0}>
-        {resume.projects.map((item) => (
-          <div className="resume-entry" key={item.id}>
-            <div className="entry-head">
-              <div>
-                <strong>{item.name}</strong>
-                <span>{clean([item.role, item.techStack]).join(" · ")}</span>
-              </div>
-              <span>{item.url}</span>
-            </div>
-            <BulletList items={item.highlights} />
-          </div>
-        ))}
-      </ResumeSection>
-
-      <ResumeSection title="教育经历" visible={resume.education.length > 0}>
-        {resume.education.map((item) => (
-          <div className="resume-entry" key={item.id}>
-            <div className="entry-head">
-              <div>
-                <strong>{item.organization}</strong>
-                <span>{item.role}</span>
-              </div>
-              <DateLine startDate={item.startDate} endDate={item.endDate} location={item.location} />
-            </div>
-            <BulletList items={item.highlights} />
-          </div>
-        ))}
-      </ResumeSection>
-
-      <ResumeSection title="技能" visible={resume.skills.length > 0}>
-        <div className="skill-lines">
-          {resume.skills.map((group) => (
-            <p key={group.id}>
-              <strong>{group.category}</strong>
-              <span>{clean(group.items).join(" · ")}</span>
-            </p>
-          ))}
-        </div>
-      </ResumeSection>
-
-      <ResumeSection title="奖项" visible={resume.awards.length > 0}>
-        {resume.awards.map((award) => (
-          <div className="award-line" key={award.id}>
-            <strong>{award.title}</strong>
-            <span>{clean([award.issuer, award.date]).join(" · ")}</span>
-          </div>
-        ))}
-      </ResumeSection>
     </article>
   );
 }
 
-function ResumeSection({
-  title,
-  visible,
-  children
-}: {
-  title: string;
-  visible: boolean;
-  children: React.ReactNode;
-}) {
-  if (!visible) {
-    return null;
-  }
-
+function ResumeSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="resume-section">
       <h2>{title}</h2>
       {children}
     </section>
   );
+}
+
+function ResumeHeader({ fields, ariaLabel }: { fields: BasicField[]; ariaLabel: string }) {
+  const name = fields.find((field) => getBasicFieldPlacement(field) === "name" && field.value.trim())?.value.trim();
+  const headlines = fields.filter((field) => getBasicFieldPlacement(field) === "headline" && field.value.trim());
+  const details = fields.filter((field) => getBasicFieldPlacement(field) === "contact" && field.value.trim());
+  const contactRows = chunkDetails(details);
+
+  return (
+    <header className="resume-header-block">
+      {name ? <h1><InlineText value={name} /></h1> : null}
+      {headlines.map((field) => (
+        <p className="resume-headline-line" key={field.id}>
+          <InlineBasicField field={field} />
+        </p>
+      ))}
+      {details.length > 0 ? (
+        <div aria-label={ariaLabel} className="resume-contact-rows" role="list">
+          {contactRows.map((row, rowIndex) => (
+            <div className="resume-contact-row" key={`contact-row-${rowIndex}`} role="presentation">
+              {row.map((field) => (
+                <span className="resume-contact-item" key={field.id} role="listitem">
+                  <InlineBasicField field={field} />
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
+      ) : null}
+    </header>
+  );
+}
+
+function InlineBasicField({ field }: { field: BasicField }) {
+  const labelMode = getBasicFieldLabelMode(field);
+  const icon = getBasicFieldLabelIcon(field);
+  const label = getBasicFieldLabelText(field);
+
+  return (
+    <>
+      {labelMode === "mark" && icon ? <BasicFieldIcon icon={icon} label={field.label} /> : label ? <strong>{label}</strong> : null}
+      <span><InlineText value={field.value} /></span>
+    </>
+  );
+}
+
+function BasicFieldIcon({ icon, label }: { icon: BasicFieldLabelIcon; label: string }) {
+  return <span aria-label={label} className={`basic-field-icon icon-${icon}`} role="img" />;
+}
+
+function SkillsAwards({ resume }: { resume: ResumeData }) {
+  return (
+    <div className="skills-awards">
+      {resume.skills.length > 0 ? (
+        <div className="skill-lines">
+          {resume.skills.map((group) => (
+            <p key={group.id}>
+              <strong><InlineText value={group.category} /></strong>
+              <span><InlineJoin values={cleanInline(group.items)} separator=" · " /></span>
+            </p>
+          ))}
+        </div>
+      ) : null}
+      {resume.awards.map((award) => (
+        <div className="award-line" key={award.id}>
+          <strong><InlineText value={award.title} /></strong>
+          <span><InlineJoin values={cleanInline([award.issuer, award.date])} separator=" · " /></span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function hasSectionContent(resume: ResumeData, sectionId: ResumeSectionId): boolean {
+  switch (sectionId) {
+    case "basics":
+      return resume.basicFields.some((field) => field.value.trim() && getBasicFieldPlacement(field) !== "hidden");
+    case "summary":
+      return Boolean(resume.summary.trim());
+    case "experience":
+      return resume.experience.length > 0;
+    case "projects":
+      return resume.projects.length > 0;
+    case "education":
+      return resume.education.length > 0;
+    case "skillsAwards":
+      return resume.skills.length > 0 || resume.awards.length > 0;
+  }
 }
 
 function BulletList({ items }: { items: string[] }) {
@@ -145,8 +227,44 @@ function BulletList({ items }: { items: string[] }) {
   return (
     <ul className="resume-bullets">
       {lines.map((item) => (
-        <li key={item}>{item}</li>
+        <li key={item}><InlineText value={item} /></li>
       ))}
     </ul>
   );
+}
+
+function InlineJoin({ values, separator }: { values: string[]; separator: string }) {
+  return (
+    <>
+      {values.map((value, index) => (
+        <React.Fragment key={`${value}-${index}`}>
+          {index > 0 ? separator : null}
+          <InlineText value={value} />
+        </React.Fragment>
+      ))}
+    </>
+  );
+}
+
+function InlineText({ value }: { value: string }) {
+  const segments = parseInlineFormat(value);
+
+  return (
+    <>
+      {segments.map((segment, index) => {
+        const className = inlineFormatClassName(segment.formats);
+        return className ? (
+          <span className={className} key={`${segment.text}-${index}`}>
+            {segment.text}
+          </span>
+        ) : (
+          <React.Fragment key={`${segment.text}-${index}`}>{segment.text}</React.Fragment>
+        );
+      })}
+    </>
+  );
+}
+
+function inlineFormatClassName(formats: InlineFormat[]): string {
+  return formats.length > 0 ? `inline-format ${Array.from(new Set(formats)).join(" ")}` : "";
 }

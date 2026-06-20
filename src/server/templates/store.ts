@@ -1,7 +1,7 @@
 import { access, mkdir, readFile, readdir, rename, writeFile } from "node:fs/promises";
 
-import { templatePackages } from "../../lib/templates";
-import type { TemplateId, TemplateMeta, TemplatePackage } from "../../types/resume";
+import { normalizeTemplateId, templatePackages } from "../../lib/templates";
+import type { TemplateMeta, TemplatePackage } from "../../types/resume";
 import { templateDataRoot, templateFile } from "./paths";
 
 async function ensureTemplateStore(): Promise<void> {
@@ -16,19 +16,23 @@ export async function seedTemplates(): Promise<void> {
 export async function listTemplateMetas(): Promise<TemplateMeta[]> {
   await seedTemplates();
   const files = await readdir(templateDataRoot());
+  const supportedIds = new Set(templatePackages.map((templatePackage) => templatePackage.meta.id));
   const packages = await Promise.all(
     files
       .filter((file) => file.endsWith(".json"))
       .map(async (file) => JSON.parse(await readFile(`${templateDataRoot()}/${file}`, "utf-8")) as TemplatePackage)
   );
 
-  return packages.map((templatePackage) => templatePackage.meta).sort((left, right) => left.category.localeCompare(right.category));
+  return packages
+    .filter((templatePackage) => supportedIds.has(templatePackage.meta.id))
+    .map((templatePackage) => templatePackage.meta)
+    .sort((left, right) => left.category.localeCompare(right.category));
 }
 
-export async function readTemplatePackage(templateId: TemplateId): Promise<TemplatePackage | null> {
+export async function readTemplatePackage(templateId: unknown): Promise<TemplatePackage | null> {
   await seedTemplates();
   try {
-    return JSON.parse(await readFile(templateFile(templateId), "utf-8")) as TemplatePackage;
+    return JSON.parse(await readFile(templateFile(normalizeTemplateId(templateId)), "utf-8")) as TemplatePackage;
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
       return null;

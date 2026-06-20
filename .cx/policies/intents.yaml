@@ -160,3 +160,23 @@ intents:
     git_policy: optional
     risk_level: medium
     requires_human_approval: []
+
+  deploy:
+    triggers:
+      - 部署
+      - 上传远端
+      - 远端服务器
+      - deploy
+      - upload remote
+    skill: feature-implementation
+    mode: plan_then_execute
+    sandbox: workspace-write
+    approval: on-request
+    docs_policy: update_if_public_behavior
+    tests_policy: require_relevant_validation
+    git_policy: no_push
+    deploy_policy: explicit_user_request_required
+    risk_level: high
+    requires_human_approval:
+      - deploy
+      - secrets_must_not_be_exposed

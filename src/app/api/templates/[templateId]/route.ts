@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import { templateIdSchema } from "@/lib/validation";
 import { readTemplatePackage } from "@/server/templates/store";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(_request: Request, { params }: { params: { templateId: string } }) {
   const parsed = templateIdSchema.safeParse(params.templateId);
   if (!parsed.success) {
