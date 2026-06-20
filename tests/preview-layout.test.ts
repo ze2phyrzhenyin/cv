@@ -84,4 +84,20 @@ describe("preview layout", () => {
     expect(globalCss).toContain(".academic-entry .entry-head strong");
     expect(globalCss).toContain(".collapsible-card > summary");
   });
+
+  it("keeps the default CV sample within a tighter A4 page and warns on overflow", () => {
+    const builderSource = readFileSync("src/components/resume-builder.tsx", "utf-8");
+    const languageSource = readFileSync("src/lib/resume-language.ts", "utf-8");
+    const globalCss = readFileSync("src/app/globals.css", "utf-8");
+
+    expect(builderSource).toContain("pageOverflow");
+    expect(builderSource).toContain("paper.scrollHeight - paper.clientHeight");
+    expect(builderSource).toContain("MutationObserver");
+    expect(builderSource).toContain("draft-page-warning");
+    expect(languageSource).toContain("pageOverflowWarning");
+    expect(globalCss).toContain("font-size: 15.5px;");
+    expect(globalCss).toContain("line-height: 1.38;");
+    expect(globalCss).toContain("padding: 40px 48px;");
+    expect(globalCss).toContain(".draft-page-warning");
+  });
 });

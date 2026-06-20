@@ -389,7 +389,7 @@ export function ResumeBuilder() {
             {pdfIsFresh && pdfUrl ? (
               <PdfCanvasPreview title={copy.previewPdf} url={pdfUrl} />
             ) : (
-              <ScaledDraftPreview resume={resume} template={template} />
+              <ScaledDraftPreview copy={copy} resume={resume} template={template} />
             )}
           </div>
         </section>
@@ -398,9 +398,10 @@ export function ResumeBuilder() {
   );
 }
 
-function ScaledDraftPreview({ resume, template }: { resume: ResumeData; template: ReturnType<typeof getTemplate> }) {
+function ScaledDraftPreview({ resume, template, copy }: { resume: ResumeData; template: ReturnType<typeof getTemplate>; copy: BuilderCopy }) {
   const frameRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(previewScreenScale);
+  const [pageOverflow, setPageOverflow] = useState(0);
 
   useEffect(() => {
     const frame = frameRef.current;
@@ -408,18 +409,39 @@ function ScaledDraftPreview({ resume, template }: { resume: ResumeData; template
       return;
     }
 
+    function updatePageOverflow() {
+      const paper = frame?.querySelector<HTMLElement>(".resume-page");
+      if (!paper) {
+        setPageOverflow(0);
+        return;
+      }
+
+      setPageOverflow(Math.max(0, paper.scrollHeight - paper.clientHeight));
+    }
+
     function updateScale() {
       const availableWidth = frame?.clientWidth || previewPageWidth;
       const nextScale = Math.min(previewScreenScale, availableWidth / previewPageWidth);
       setScale(Math.max(0.45, Number(nextScale.toFixed(3))));
+      updatePageOverflow();
     }
 
     updateScale();
     const observer = new ResizeObserver(updateScale);
     observer.observe(frame);
+    const paper = frame.querySelector<HTMLElement>(".resume-page");
+    const mutationObserver = new MutationObserver(updatePageOverflow);
+    if (paper) {
+      mutationObserver.observe(paper, { childList: true, characterData: true, subtree: true });
+    }
+    const raf = window.requestAnimationFrame(updatePageOverflow);
 
-    return () => observer.disconnect();
-  }, []);
+    return () => {
+      window.cancelAnimationFrame(raf);
+      mutationObserver.disconnect();
+      observer.disconnect();
+    };
+  }, [resume, template]);
 
   const width = previewPageWidth * scale;
   const height = previewPageHeight * scale;
@@ -431,6 +453,7 @@ function ScaledDraftPreview({ resume, template }: { resume: ResumeData; template
 
   return (
     <div className="draft-preview-frame" ref={frameRef}>
+      {pageOverflow > 0 ? <div className="draft-page-warning">{copy.pageOverflowWarning}</div> : null}
       <div className="draft-preview" style={style}>
         <ResumePreview resume={resume} template={template} />
       </div>

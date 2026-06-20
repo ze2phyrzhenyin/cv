@@ -38,6 +38,7 @@ type AppCopy = {
   previewTitle: string;
   previewDraft: string;
   previewPdf: string;
+  pageOverflowWarning: string;
   buttons: {
     exportTex: string;
     downloadPdf: string;
@@ -297,6 +298,7 @@ const appCopy: Record<ResumeLanguage, AppCopy> = {
     previewTitle: "CV 预览",
     previewDraft: "草稿预览",
     previewPdf: "PDF 预览",
+    pageOverflowWarning: "内容已超过一页，建议精简内容或改为两页 CV。",
     buttons: {
       exportTex: "导出 .tex",
       downloadPdf: "下载 PDF",
@@ -435,6 +437,7 @@ const appCopy: Record<ResumeLanguage, AppCopy> = {
     previewTitle: "CV Preview",
     previewDraft: "Draft preview",
     previewPdf: "PDF preview",
+    pageOverflowWarning: "Content exceeds one page. Consider tightening the text or using a two-page CV.",
     buttons: {
       exportTex: "Export .tex",
       downloadPdf: "Download PDF",
@@ -573,6 +576,7 @@ const appCopy: Record<ResumeLanguage, AppCopy> = {
     previewTitle: "Aperçu du CV",
     previewDraft: "Aperçu brouillon",
     previewPdf: "Aperçu PDF",
+    pageOverflowWarning: "Le contenu dépasse une page. Réduisez le texte ou passez à un CV sur deux pages.",
     buttons: {
       exportTex: "Exporter .tex",
       downloadPdf: "Télécharger PDF",
