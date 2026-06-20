@@ -296,7 +296,7 @@ const appCopy: Record<ResumeLanguage, AppCopy> = {
     previewAria: "PDF 预览",
     previewTitle: "CV 预览",
     previewDraft: "草稿预览",
-    previewPdf: "LaTeX PDF 预览",
+    previewPdf: "PDF 预览",
     buttons: {
       exportTex: "导出 .tex",
       downloadPdf: "下载 PDF",
@@ -434,7 +434,7 @@ const appCopy: Record<ResumeLanguage, AppCopy> = {
     previewAria: "PDF preview",
     previewTitle: "CV Preview",
     previewDraft: "Draft preview",
-    previewPdf: "LaTeX PDF preview",
+    previewPdf: "PDF preview",
     buttons: {
       exportTex: "Export .tex",
       downloadPdf: "Download PDF",
@@ -572,7 +572,7 @@ const appCopy: Record<ResumeLanguage, AppCopy> = {
     previewAria: "Aperçu PDF",
     previewTitle: "Aperçu du CV",
     previewDraft: "Aperçu brouillon",
-    previewPdf: "Aperçu PDF LaTeX",
+    previewPdf: "Aperçu PDF",
     buttons: {
       exportTex: "Exporter .tex",
       downloadPdf: "Télécharger PDF",

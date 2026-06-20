@@ -383,7 +383,7 @@ export function ResumeBuilder() {
               <strong>{copy.previewTitle}</strong>
               <span>{pdfIsFresh ? copy.previewPdf : previewStatusLabel(compileState, copy)}</span>
             </div>
-            <span>{compileState === "compiling" ? "running" : template.engine}</span>
+            <span>{compileState === "compiling" ? "running" : pdfIsFresh ? "html/pdf" : template.engine}</span>
           </div>
           <div className="print-area">
             {pdfIsFresh && pdfUrl ? (
