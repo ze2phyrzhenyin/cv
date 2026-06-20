@@ -23,19 +23,31 @@ describe("preview layout", () => {
   it("keeps draft preview and generated PDF typography on the same stylesheet path", () => {
     const globalCss = readFileSync("src/app/globals.css", "utf-8");
     const htmlPdfSource = readFileSync("src/server/compile/html-pdf.tsx", "utf-8");
+    const compilerSource = readFileSync("src/server/compile/compiler.ts", "utf-8");
 
     expect(globalCss).toContain('font-family: "Songti SC", "Noto Serif CJK SC", "Times New Roman", serif;');
+    expect(htmlPdfSource).toContain("ResumePreview");
+    expect(htmlPdfSource).toContain("renderToStaticMarkup");
+    expect(compilerSource).toContain('return "browser";');
     expect(htmlPdfSource).not.toContain("font-size: 16px !important");
     expect(htmlPdfSource).not.toContain("line-height: 1.42 !important");
   });
 
   it("renders default basic field marks as built-in icons", () => {
     const previewSource = readFileSync("src/components/resume-preview.tsx", "utf-8");
+    const fixtureSource = readFileSync("src/lib/fixtures.ts", "utf-8");
     const globalCss = readFileSync("src/app/globals.css", "utf-8");
 
+    expect(previewSource).toContain("react-icons/fa6");
+    expect(previewSource).toContain("BASIC_FIELD_ICONS");
+    expect(previewSource).toContain("FaCakeCandles");
+    expect(previewSource).toContain("FaFlag");
+    expect(fixtureSource).toContain('labelIcon: "age"');
+    expect(fixtureSource).toContain('labelIcon: "nationality"');
     expect(previewSource).toContain("basic-field-icon");
-    expect(globalCss).toContain(".basic-field-icon.icon-email");
-    expect(globalCss).toContain(".basic-field-icon.icon-location");
+    expect(globalCss).not.toContain(".basic-field-icon.icon-email::before");
+    expect(globalCss).not.toContain(".basic-field-icon.icon-phone::after");
+    expect(globalCss).not.toContain(".basic-field-icon.icon-github::before");
   });
 
   it("exposes inline format controls and preview styles", () => {
@@ -46,5 +58,30 @@ describe("preview layout", () => {
     expect(builderSource).toContain("inline-format-toolbar");
     expect(previewSource).toContain("parseInlineFormat");
     expect(globalCss).toContain(".inline-format.underline.strike");
+  });
+
+  it("keeps upgraded sample drafts recoverable without hiding custom drafts", () => {
+    const builderSource = readFileSync("src/components/resume-builder.tsx", "utf-8");
+    const languageSource = readFileSync("src/lib/resume-language.ts", "utf-8");
+
+    expect(builderSource).toContain("sampleDraftVersion");
+    expect(builderSource).toContain("isLegacyBundledSample");
+    expect(builderSource).toContain("draftVersion: sampleDraftVersion");
+    expect(builderSource).toContain("resetToSample");
+    expect(languageSource).toContain("resetSample");
+  });
+
+  it("uses compact academic entries and collapsible editor cards", () => {
+    const builderSource = readFileSync("src/components/resume-builder.tsx", "utf-8");
+    const previewSource = readFileSync("src/components/resume-preview.tsx", "utf-8");
+    const globalCss = readFileSync("src/app/globals.css", "utf-8");
+
+    expect(builderSource).toContain("CollapsibleCard");
+    expect(builderSource).toContain("collapsible-card");
+    expect(previewSource).toContain("academic-entry");
+    expect(previewSource).toContain("formatDoi");
+    expect(globalCss).toContain(".resume-section.academic-section");
+    expect(globalCss).toContain(".academic-entry .entry-head strong");
+    expect(globalCss).toContain(".collapsible-card > summary");
   });
 });

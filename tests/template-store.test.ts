@@ -41,7 +41,7 @@ describe("template store", () => {
     const tex = generateLatex(sampleResume, getTemplate("older-saved-template"));
 
     expect(legacyPackage?.meta.id).toBe("unified-cv");
-    expect(tex).toContain("\\resumeSection{教育}");
+    expect(tex).toContain("\\resumeSection{教育经历}");
     expect(tex).toContain("\\begin{itemize}[leftmargin=*, label={-}");
   });
 });

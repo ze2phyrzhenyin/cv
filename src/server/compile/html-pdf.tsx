@@ -50,6 +50,9 @@ export async function renderResumePdf(job: CompileJobRecord, outputPdf: string, 
 async function findChromiumExecutable(): Promise<string> {
   const candidates = [
     process.env.RESUME_TEX_CHROMIUM_PATH,
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "/Applications/Chromium.app/Contents/MacOS/Chromium",
+    "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
     "/usr/bin/chromium",
     "/usr/bin/chromium-browser",
     "/usr/bin/google-chrome-stable",

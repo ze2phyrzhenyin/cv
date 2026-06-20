@@ -2,7 +2,7 @@ export type TemplateId = "unified-cv";
 
 export type ResumeLanguage = "zh-CN" | "en" | "fr";
 
-export type ResumeSectionId = "basics" | "summary" | "experience" | "projects" | "education" | "skillsAwards";
+export type ResumeSectionId = "basics" | "summary" | "experience" | "academic" | "projects" | "education" | "skillsAwards";
 
 export type ResumeSectionConfig = {
   id: ResumeSectionId;
@@ -29,7 +29,7 @@ export type BasicFieldPlacement = "name" | "headline" | "contact" | "hidden";
 
 export type BasicFieldLabelMode = "text" | "mark" | "custom" | "none";
 
-export type BasicFieldLabelIcon = "email" | "phone" | "location" | "website" | "github" | "linkedin" | "link";
+export type BasicFieldLabelIcon = "email" | "phone" | "location" | "website" | "github" | "linkedin" | "link" | "age" | "nationality";
 
 export type BasicField = {
   id: string;
@@ -61,6 +61,19 @@ export type ProjectItem = {
   highlights: string[];
 };
 
+export type AcademicItem = {
+  id: string;
+  title: string;
+  authors: string;
+  venue: string;
+  publicationStatus: string;
+  date: string;
+  doi: string;
+  url: string;
+  contribution: string;
+  highlights: string[];
+};
+
 export type SkillGroup = {
   id: string;
   category: string;
@@ -83,6 +96,7 @@ export type ResumeData = {
   summary: string;
   education: TimelineItem[];
   experience: TimelineItem[];
+  academic: AcademicItem[];
   projects: ProjectItem[];
   skills: SkillGroup[];
   awards: AwardItem[];

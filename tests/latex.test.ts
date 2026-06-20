@@ -21,24 +21,32 @@ describe("generateLatex", () => {
     expect(tex).toContain("\\usepackage{fontspec}");
     expect(tex).toContain("\\usepackage[normalem]{ulem}");
     expect(tex).toContain("\\setmainfont{Songti SC}");
-    expect(tex).toContain("{\\Huge\\bfseries\\color{ResumeAccent}张三}");
-    expect(tex).toContain("\\textbf{mail} zhangsan@example.com");
+    expect(tex).toContain("{\\Huge\\bfseries\\color{ResumeAccent}Zhaoyang SUI}");
+    expect(tex).toContain("\\textbf{mail} zhaoyang.sui@ut-capitole.fr");
     expect(tex).toContain("\\textcolor{black!45}{|}");
     expect(tex).toContain("\\hrule height 0.8pt");
     expect(tex).toContain("\\XeTeXlinebreaklocale \"zh\"");
-    expect(tex).toContain("\\resumeSection{工作}");
+    expect(tex).toContain("\\resumeSection{工作经历}");
+    expect(tex).toContain("\\resumeSection{学术经历}");
     expect(tex).toContain("\\begin{itemize}[leftmargin=*, label={-}");
-    expect(tex).toContain("PostgreSQL");
+    expect(tex).toContain("Zhaoyang SUI 等");
+    expect(tex).toContain("已发表会议论文");
+    expect(tex).toContain("大语言模型微调编程");
+    expect(tex).toContain("P-Tuning v2");
   });
 
   it("renders language-specific section headings for English and French resumes", () => {
     const englishTex = generateLatex(sampleResumes.en, getTemplate("unified-cv"));
     const frenchTex = generateLatex(sampleResumes.fr, getTemplate("unified-cv"));
 
-    expect(englishTex).toContain("\\resumeSection{Work}");
-    expect(englishTex).toContain("Backend Software Engineer");
-    expect(frenchTex).toContain("\\resumeSection{Expérience}");
-    expect(frenchTex).toContain("Ingénieur logiciel backend");
+    expect(englishTex).toContain("\\resumeSection{Work Experience}");
+    expect(englishTex).toContain("\\resumeSection{Academic Experience}");
+    expect(englishTex).toContain("MIAGE Master's Preparatory Year Student");
+    expect(englishTex).toContain("Published conference paper");
+    expect(frenchTex).toContain("\\resumeSection{Expérience professionnelle}");
+    expect(frenchTex).toContain("\\resumeSection{Expérience académique}");
+    expect(frenchTex).toContain("Étudiant en année préparatoire Master MIAGE");
+    expect(frenchTex).toContain("Article de conférence publié");
   });
 
   it("honors custom accent color, basic fields, and section order", () => {
@@ -92,6 +100,7 @@ describe("generateLatex", () => {
     const tex = generateLatex(
       {
         ...sampleResume,
+        sections: sampleResume.sections.map((section) => (section.id === "summary" ? { ...section, visible: true } : section)),
         basicFields: sampleResume.basicFields.map((field) => (field.key === "name" ? { ...field, value: "Foo_Bar" } : field)),
         summary: "R&D achieved 50% uptime gain"
       },
@@ -106,6 +115,7 @@ describe("generateLatex", () => {
     const tex = generateLatex(
       {
         ...sampleResume,
+        sections: sampleResume.sections.map((section) => (section.id === "summary" ? { ...section, visible: true } : section)),
         summary: "Built [[b]]fast[[/b]], [[i]]typed[[/i]], [[u]]stable[[/u]], and [[s]]legacy[[/s]] APIs",
         experience: [
           {

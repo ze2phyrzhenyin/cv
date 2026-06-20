@@ -1,5 +1,7 @@
 import type { CSSProperties } from "react";
 import React from "react";
+import { FaCakeCandles, FaEnvelope, FaFlag, FaGithub, FaGlobe, FaLink, FaLinkedin, FaLocationDot, FaPhone } from "react-icons/fa6";
+import type { IconType } from "react-icons";
 
 import { parseInlineFormat } from "@/lib/inline-format";
 import type { InlineFormat } from "@/lib/inline-format";
@@ -13,6 +15,18 @@ import {
   normalizeResumeLanguage
 } from "@/lib/resume-language";
 import type { BasicField, BasicFieldLabelIcon, ResumeData, ResumeSectionId, TemplateMeta } from "@/types/resume";
+
+const BASIC_FIELD_ICONS: Record<BasicFieldLabelIcon, IconType> = {
+  email: FaEnvelope,
+  phone: FaPhone,
+  location: FaLocationDot,
+  website: FaGlobe,
+  github: FaGithub,
+  linkedin: FaLinkedin,
+  link: FaLink,
+  age: FaCakeCandles,
+  nationality: FaFlag
+};
 
 type ResumePreviewProps = {
   resume: ResumeData;
@@ -43,6 +57,11 @@ function DateLine({ startDate, endDate, location }: { startDate: string; endDate
   );
 }
 
+function formatDoi(doi: string): string {
+  const value = doi.trim();
+  return value ? `DOI: ${value}` : "";
+}
+
 export function ResumePreview({ resume, template }: ResumePreviewProps) {
   const data = normalizeResumeLanguage(resume);
   const copy = getResumeCopy(data);
@@ -62,6 +81,25 @@ export function ResumePreview({ resume, template }: ResumePreviewProps) {
                 <span><InlineText value={item.role} /></span>
               </div>
               <DateLine startDate={item.startDate} endDate={item.endDate} location={item.location} />
+            </div>
+            <BulletList items={item.highlights} />
+          </div>
+        ))}
+      </>
+    ),
+    academic: (
+      <>
+        {data.academic.map((item) => (
+          <div className="resume-entry academic-entry" key={item.id}>
+            <div className="entry-head">
+              <div>
+                <strong><InlineText value={item.title} /></strong>
+                <span><InlineJoin values={cleanInline([item.authors, item.venue, item.publicationStatus])} separator=" · " /></span>
+                {item.contribution.trim() ? (
+                  <span><InlineText value={item.contribution} /></span>
+                ) : null}
+              </div>
+              <span><InlineJoin values={cleanInline([item.date, formatDoi(item.doi), item.url])} separator=" · " /></span>
             </div>
             <BulletList items={item.highlights} />
           </div>
@@ -111,7 +149,7 @@ export function ResumePreview({ resume, template }: ResumePreviewProps) {
           section.id === "basics" ? (
             <ResumeHeader key={section.id} ariaLabel={copy.contactAria} fields={data.basicFields} />
           ) : (
-            <ResumeSection key={section.id} title={section.title}>
+            <ResumeSection className={section.id === "academic" ? "academic-section" : undefined} key={section.id} title={section.title}>
               {sectionBodies[section.id]}
             </ResumeSection>
           )
@@ -120,9 +158,9 @@ export function ResumePreview({ resume, template }: ResumePreviewProps) {
   );
 }
 
-function ResumeSection({ title, children }: { title: string; children: React.ReactNode }) {
+function ResumeSection({ title, children, className }: { title: string; children: React.ReactNode; className?: string }) {
   return (
-    <section className="resume-section">
+    <section className={["resume-section", className].filter(Boolean).join(" ")}>
       <h2>{title}</h2>
       {children}
     </section>
@@ -174,7 +212,9 @@ function InlineBasicField({ field }: { field: BasicField }) {
 }
 
 function BasicFieldIcon({ icon, label }: { icon: BasicFieldLabelIcon; label: string }) {
-  return <span aria-label={label} className={`basic-field-icon icon-${icon}`} role="img" />;
+  const Icon = BASIC_FIELD_ICONS[icon];
+
+  return <Icon aria-label={label} className={`basic-field-icon icon-${icon}`} role="img" />;
 }
 
 function SkillsAwards({ resume }: { resume: ResumeData }) {
@@ -208,6 +248,8 @@ function hasSectionContent(resume: ResumeData, sectionId: ResumeSectionId): bool
       return Boolean(resume.summary.trim());
     case "experience":
       return resume.experience.length > 0;
+    case "academic":
+      return resume.academic.length > 0;
     case "projects":
       return resume.projects.length > 0;
     case "education":

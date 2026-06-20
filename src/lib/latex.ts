@@ -1,4 +1,4 @@
-import type { BasicField, ProjectItem, ResumeData, ResumeSectionId, TemplateMeta, TimelineItem } from "@/types/resume";
+import type { AcademicItem, BasicField, ProjectItem, ResumeData, ResumeSectionId, TemplateMeta, TimelineItem } from "@/types/resume";
 import { parseInlineFormat } from "./inline-format";
 import type { InlineFormat } from "./inline-format";
 import { getBasicFieldLabelText, getBasicFieldPlacement, getResumeAccentColor, normalizeResumeLanguage } from "./resume-language";
@@ -78,6 +78,26 @@ function renderProjects(items: ProjectItem[]): string {
     .join("\n\n");
 }
 
+function formatDoi(doi: string): string {
+  const value = doi.trim();
+  return value ? `DOI: ${value}` : "";
+}
+
+function renderAcademic(items: AcademicItem[]): string {
+  return items
+    .map((item) => {
+      const meta = cleanLines([item.authors, item.venue, item.publicationStatus, item.contribution]).map(renderInlineLatex).join(" \\quad ");
+      const side = cleanLines([item.date, formatDoi(item.doi), item.url]).map(renderInlineLatex).join(" \\quad ");
+      return [
+        `\\resumeEntry{${renderInlineLatex(item.title)}}{${meta}}{${side}}`,
+        renderHighlights(item.highlights)
+      ]
+        .filter(Boolean)
+        .join("\n");
+    })
+    .join("\n\n");
+}
+
 function renderSection(title: string, body: string): string {
   if (!body.trim()) {
     return "";
@@ -110,6 +130,7 @@ export function generateLatex(resume: ResumeData, template: TemplateMeta): strin
     basics: "",
     summary: renderInlineLatex(data.summary),
     experience: renderTimeline(data.experience),
+    academic: renderAcademic(data.academic),
     projects: renderProjects(data.projects),
     education: renderTimeline(data.education),
     skillsAwards: [skillLines, awardLines].filter(Boolean).join("\n\n")

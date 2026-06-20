@@ -4,225 +4,417 @@ import { normalizeResumeLanguage } from "./resume-language";
 export const sampleResumes: Record<ResumeLanguage, ResumeData> = {
   "zh-CN": normalizeResumeLanguage({
     language: "zh-CN",
+    sections: [
+      { id: "basics", title: "基本信息", visible: true },
+      { id: "education", title: "教育经历", visible: true },
+      { id: "experience", title: "工作经历", visible: true },
+      { id: "academic", title: "学术经历", visible: true },
+      { id: "skillsAwards", title: "技能", visible: true },
+      { id: "summary", title: "简介", visible: false },
+      { id: "projects", title: "项目", visible: false }
+    ],
     basics: {
-      name: "张三",
-      title: "后端开发工程师",
-      email: "zhangsan@example.com",
-      phone: "+86 138 0000 0000",
-      location: "上海",
-      website: "https://example.com",
-      github: "https://github.com/example",
+      name: "Zhaoyang SUI",
+      title: "MIAGE 硕士预科学生",
+      email: "zhaoyang.sui@ut-capitole.fr",
+      phone: "(+33) 07 43 64 47 77",
+      location: "Toulouse, France",
+      website: "",
+      github: "",
       linkedin: ""
     },
-    summary:
-      "3 年后端开发经验，熟悉 TypeScript、Java、PostgreSQL 与分布式系统。关注接口稳定性、性能优化和工程化交付。",
+    basicFields: [
+      { id: "name", key: "name", label: "姓名", value: "Zhaoyang SUI", placement: "name", labelMode: "none" },
+      { id: "title", key: "title", label: "身份", value: "MIAGE 硕士预科学生", placement: "headline", labelMode: "none" },
+      { id: "age", label: "年龄", value: "23 岁", placement: "contact", labelMode: "mark", labelIcon: "age" },
+      { id: "location", key: "location", label: "城市", value: "Toulouse, France", placement: "contact", labelMode: "mark", labelIcon: "location" },
+      { id: "nationality", label: "国籍", value: "中国", placement: "contact", labelMode: "mark", labelIcon: "nationality" },
+      { id: "phone", key: "phone", label: "电话", value: "(+33) 07 43 64 47 77", placement: "contact", labelMode: "mark", labelIcon: "phone" },
+      { id: "email", key: "email", label: "邮箱", value: "zhaoyang.sui@ut-capitole.fr", placement: "contact", labelMode: "mark", labelIcon: "email" }
+    ],
+    summary: "",
     education: [
       {
-        id: "edu-1",
-        organization: "上海交通大学",
-        role: "计算机科学与技术 本科",
-        location: "上海",
-        startDate: "2019-09",
-        endDate: "2023-06",
-        highlights: ["GPA 3.8/4.0", "校级优秀毕业生"]
+        id: "edu-miage",
+        organization: "图卢兹第一大学",
+        role: "MIAGE 硕士入学预科",
+        location: "图卢兹，法国",
+        startDate: "2025年9月",
+        endDate: "至今",
+        highlights: []
+      },
+      {
+        id: "edu-shnu",
+        organization: "上海师范大学",
+        role: "计算机科学本科",
+        location: "上海，中国",
+        startDate: "2020年10月",
+        endDate: "2024年6月",
+        highlights: ["平均成绩：76.13/100"]
       }
     ],
     experience: [
       {
-        id: "exp-1",
-        organization: "某科技公司",
-        role: "后端开发工程师",
+        id: "exp-zhunshi",
+        organization: "Shanghai Zhunshi Intelligent Information Technology Co., Ltd.",
+        role: "C++ 开发工程师",
         location: "上海",
-        startDate: "2023-07",
-        endDate: "至今",
+        startDate: "2023年5月",
+        endDate: "2023年12月",
         highlights: [
-          "负责订单系统核心接口开发，支持日均百万级请求。",
-          "将关键接口 P95 延迟从 420ms 降低至 180ms。",
-          "设计 Redis 缓存策略，降低数据库峰值查询压力。"
+          "开发 .xml 和 .xsd 文件格式转换算法，使用递归并结合 Visual Studio 内置转换功能。",
+          "独立开发公司网站，技术栈包括 React、Node.js、Nginx 等。"
         ]
-      }
-    ],
-    projects: [
-      {
-        id: "project-1",
-        name: "在线简历生成系统",
-        role: "全栈开发",
-        url: "https://example.com",
-        techStack: "Next.js, TypeScript, LaTeX, PostgreSQL",
-        highlights: [
-          "设计结构化 Resume JSON，并通过模板引擎生成 LaTeX 源码。",
-          "封装编译任务接口，预留容器化 XeLaTeX Worker。"
-        ]
-      }
-    ],
-    skills: [
-      {
-        id: "skill-1",
-        category: "编程语言",
-        items: ["TypeScript", "Java", "Python"]
       },
       {
-        id: "skill-2",
-        category: "数据库",
-        items: ["PostgreSQL", "Redis", "MySQL"]
+        id: "exp-lankuaikei",
+        organization: "Shanghai Lankuaikei Technology Development Co., Ltd.",
+        role: "测试工程师",
+        location: "上海",
+        startDate: "2022年7月",
+        endDate: "2022年9月",
+        highlights: ["测试大屏端和移动端软件，并编写测试文档。"]
       }
     ],
-    awards: [
+    academic: [
       {
-        id: "award-1",
-        title: "ACM 校赛一等奖",
-        issuer: "上海交通大学",
-        date: "2022"
+        id: "academic-hcii-2025",
+        title: "New Objects, New Methods, and New Verifications Bie-modernist Cultural Computing on Contemporary South Korean Literary Works",
+        authors: "Zhaoyang SUI 等",
+        venue: "HCII 2025",
+        publicationStatus: "已发表会议论文",
+        date: "2025年1月",
+        doi: "",
+        url: "",
+        contribution: "技术实现升级",
+        highlights: ["负责 2024 年相关工作的技术实现升级。"]
+      },
+      {
+        id: "academic-hcii-2024",
+        title: "Bie-Modernism Cultural Computing of Literary Works of \"Three Musketeers of Tie Xi\" Based on the Pre-trained Dialogue Models ChatGLM3",
+        authors: "Zhaoyang SUI 等",
+        venue: "HCII 2024",
+        publicationStatus: "已发表会议论文",
+        date: "2024年1月",
+        doi: "",
+        url: "",
+        contribution: "大语言模型微调编程",
+        highlights: [
+          "负责大语言模型微调相关编程工作。",
+          "使用 P-Tuning v2 基于 46 部中文小说训练模型，用于复杂文学概念分类。"
+        ]
+      },
+      {
+        id: "academic-wcee-2024",
+        title: "Intelligent Damage Recognition of Timber Structure Connections Based on X-ray Digital Radiography Method",
+        authors: "Zhaoyang SUI 等",
+        venue: "WCEE 2024",
+        publicationStatus: "已发表会议论文",
+        date: "2023年4月",
+        doi: "",
+        url: "",
+        contribution: "程序开发与算法设计",
+        highlights: [
+          "负责程序开发与算法设计。",
+          "使用 YOLO-v8 与区域生长等基础算法完成实现。"
+        ]
       }
-    ]
+    ],
+    projects: [],
+    skills: [
+      {
+        id: "skill-languages",
+        category: "语言",
+        items: ["中文：母语", "英语：B1+", "法语：B1+"]
+      },
+      {
+        id: "skill-computing",
+        category: "信息技术",
+        items: [
+          "高级语言编程：C/C++、Python、Java、R、SQL",
+          "Linux 系统部署",
+          "深度学习、大语言模型微调与 RAG",
+          "Web 开发：React、Node.js、Nginx"
+        ]
+      }
+    ],
+    awards: []
   }),
   en: normalizeResumeLanguage({
     language: "en",
+    sections: [
+      { id: "basics", title: "Basic Info", visible: true },
+      { id: "education", title: "Education", visible: true },
+      { id: "experience", title: "Work Experience", visible: true },
+      { id: "academic", title: "Academic Experience", visible: true },
+      { id: "skillsAwards", title: "Skills", visible: true },
+      { id: "summary", title: "Summary", visible: false },
+      { id: "projects", title: "Projects", visible: false }
+    ],
     basics: {
-      name: "Zhang San",
-      title: "Backend Software Engineer",
-      email: "zhangsan@example.com",
-      phone: "+86 138 0000 0000",
-      location: "Shanghai",
-      website: "https://example.com",
-      github: "https://github.com/example",
+      name: "Zhaoyang SUI",
+      title: "MIAGE Master's Preparatory Year Student",
+      email: "zhaoyang.sui@ut-capitole.fr",
+      phone: "(+33) 07 43 64 47 77",
+      location: "Toulouse, France",
+      website: "",
+      github: "",
       linkedin: ""
     },
-    summary:
-      "Backend engineer with 3 years of experience in TypeScript, Java, PostgreSQL, and distributed systems. Focused on API reliability, performance optimization, and engineering delivery.",
+    basicFields: [
+      { id: "name", key: "name", label: "Name", value: "Zhaoyang SUI", placement: "name", labelMode: "none" },
+      { id: "title", key: "title", label: "Profile", value: "MIAGE Master's Preparatory Year Student", placement: "headline", labelMode: "none" },
+      { id: "age", label: "Age", value: "23", placement: "contact", labelMode: "mark", labelIcon: "age" },
+      { id: "location", key: "location", label: "Location", value: "Toulouse, France", placement: "contact", labelMode: "mark", labelIcon: "location" },
+      { id: "nationality", label: "Nationality", value: "Chinese", placement: "contact", labelMode: "mark", labelIcon: "nationality" },
+      { id: "phone", key: "phone", label: "Phone", value: "(+33) 07 43 64 47 77", placement: "contact", labelMode: "mark", labelIcon: "phone" },
+      { id: "email", key: "email", label: "Email", value: "zhaoyang.sui@ut-capitole.fr", placement: "contact", labelMode: "mark", labelIcon: "email" }
+    ],
+    summary: "",
     education: [
       {
-        id: "edu-1",
-        organization: "Shanghai Jiao Tong University",
-        role: "B.S. in Computer Science and Technology",
-        location: "Shanghai",
-        startDate: "2019-09",
-        endDate: "2023-06",
-        highlights: ["GPA 3.8/4.0", "Outstanding Graduate Award"]
+        id: "edu-miage",
+        organization: "Toulouse 1 Capitole University",
+        role: "Preparatory year for MIAGE Master's admission",
+        location: "Toulouse, France",
+        startDate: "September 2025",
+        endDate: "Present",
+        highlights: []
+      },
+      {
+        id: "edu-shnu",
+        organization: "Shanghai Normal University",
+        role: "Bachelor's degree in Computer Science",
+        location: "Shanghai, China",
+        startDate: "October 2020",
+        endDate: "June 2024",
+        highlights: ["Average grade: 76.13/100"]
       }
     ],
     experience: [
       {
-        id: "exp-1",
-        organization: "Technology Company",
-        role: "Backend Software Engineer",
+        id: "exp-zhunshi",
+        organization: "Shanghai Zhunshi Intelligent Information Technology Co., Ltd.",
+        role: "C++ Development Engineer",
         location: "Shanghai",
-        startDate: "2023-07",
-        endDate: "Present",
+        startDate: "May 2023",
+        endDate: "December 2023",
         highlights: [
-          "Built core order-service APIs supporting over 1M requests per day.",
-          "Reduced P95 latency on key endpoints from 420 ms to 180 ms.",
-          "Designed a Redis caching strategy that reduced peak database read pressure."
+          "Developed .xml and .xsd file-format conversion algorithms using recursion and Visual Studio's built-in conversion feature.",
+          "Independently developed the company website with React, Node.js, Nginx, and related tooling."
         ]
-      }
-    ],
-    projects: [
-      {
-        id: "project-1",
-        name: "Online Resume Generator",
-        role: "Full-Stack Developer",
-        url: "https://example.com",
-        techStack: "Next.js, TypeScript, LaTeX, PostgreSQL",
-        highlights: [
-          "Designed a structured Resume JSON format and generated LaTeX source through a template engine.",
-          "Built the compile-job API and reserved a containerized XeLaTeX worker path."
-        ]
-      }
-    ],
-    skills: [
-      {
-        id: "skill-1",
-        category: "Programming Languages",
-        items: ["TypeScript", "Java", "Python"]
       },
       {
-        id: "skill-2",
-        category: "Databases",
-        items: ["PostgreSQL", "Redis", "MySQL"]
+        id: "exp-lankuaikei",
+        organization: "Shanghai Lankuaikei Technology Development Co., Ltd.",
+        role: "Test Engineer",
+        location: "Shanghai",
+        startDate: "July 2022",
+        endDate: "September 2022",
+        highlights: ["Tested large-screen and mobile software, and wrote test documentation."]
       }
     ],
-    awards: [
+    academic: [
       {
-        id: "award-1",
-        title: "First Prize, ACM Campus Contest",
-        issuer: "Shanghai Jiao Tong University",
-        date: "2022"
+        id: "academic-hcii-2025",
+        title: "New Objects, New Methods, and New Verifications Bie-modernist Cultural Computing on Contemporary South Korean Literary Works",
+        authors: "Zhaoyang SUI et al.",
+        venue: "HCII 2025",
+        publicationStatus: "Published conference paper",
+        date: "January 2025",
+        doi: "",
+        url: "",
+        contribution: "Technical implementation upgrade",
+        highlights: ["Responsible for the technical implementation of improvements to the 2024 work."]
+      },
+      {
+        id: "academic-hcii-2024",
+        title: "Bie-Modernism Cultural Computing of Literary Works of \"Three Musketeers of Tie Xi\" Based on the Pre-trained Dialogue Models ChatGLM3",
+        authors: "Zhaoyang SUI et al.",
+        venue: "HCII 2024",
+        publicationStatus: "Published conference paper",
+        date: "January 2024",
+        doi: "",
+        url: "",
+        contribution: "LLM fine-tuning programming",
+        highlights: [
+          "Programmed the fine-tuning workflow for large language models.",
+          "Trained P-Tuning v2 models on 46 Chinese novels to classify complex literary concepts."
+        ]
+      },
+      {
+        id: "academic-wcee-2024",
+        title: "Intelligent Damage Recognition of Timber Structure Connections Based on X-ray Digital Radiography Method",
+        authors: "Zhaoyang SUI et al.",
+        venue: "WCEE 2024",
+        publicationStatus: "Published conference paper",
+        date: "April 2023",
+        doi: "",
+        url: "",
+        contribution: "Programming and algorithm design",
+        highlights: [
+          "Responsible for programming and algorithm design.",
+          "Implemented the method with YOLO-v8 and fundamental algorithms including region growing."
+        ]
       }
-    ]
+    ],
+    projects: [],
+    skills: [
+      {
+        id: "skill-languages",
+        category: "Languages",
+        items: ["Chinese: native", "English: B1+", "French: B1+"]
+      },
+      {
+        id: "skill-computing",
+        category: "Technical Skills",
+        items: [
+          "Advanced programming: C/C++, Python, Java, R, SQL",
+          "Linux system deployment",
+          "Deep learning, LLM fine-tuning, and RAG",
+          "Web development: React, Node.js, Nginx"
+        ]
+      }
+    ],
+    awards: []
   }),
   fr: normalizeResumeLanguage({
     language: "fr",
+    sections: [
+      { id: "basics", title: "Infos de base", visible: true },
+      { id: "education", title: "Formation", visible: true },
+      { id: "experience", title: "Expérience professionnelle", visible: true },
+      { id: "academic", title: "Expérience académique", visible: true },
+      { id: "skillsAwards", title: "Compétences", visible: true },
+      { id: "summary", title: "Profil", visible: false },
+      { id: "projects", title: "Projets", visible: false }
+    ],
     basics: {
-      name: "Zhang San",
-      title: "Ingénieur logiciel backend",
-      email: "zhangsan@example.com",
-      phone: "+86 138 0000 0000",
-      location: "Shanghai",
-      website: "https://example.com",
-      github: "https://github.com/example",
+      name: "Zhaoyang SUI",
+      title: "Étudiant en année préparatoire Master MIAGE",
+      email: "zhaoyang.sui@ut-capitole.fr",
+      phone: "(+33) 07 43 64 47 77",
+      location: "Toulouse, France",
+      website: "",
+      github: "",
       linkedin: ""
     },
-    summary:
-      "Ingénieur backend avec 3 ans d'expérience en TypeScript, Java, PostgreSQL et systèmes distribués. Spécialisé dans la fiabilité des API, l'optimisation des performances et la livraison technique.",
+    basicFields: [
+      { id: "name", key: "name", label: "Nom", value: "Zhaoyang SUI", placement: "name", labelMode: "none" },
+      { id: "title", key: "title", label: "Profil", value: "Étudiant en année préparatoire Master MIAGE", placement: "headline", labelMode: "none" },
+      { id: "age", label: "Âge", value: "23 ans", placement: "contact", labelMode: "mark", labelIcon: "age" },
+      { id: "location", key: "location", label: "Lieu", value: "Toulouse, France", placement: "contact", labelMode: "mark", labelIcon: "location" },
+      { id: "nationality", label: "Nationalité", value: "chinoise", placement: "contact", labelMode: "mark", labelIcon: "nationality" },
+      { id: "phone", key: "phone", label: "Téléphone", value: "(+33) 07 43 64 47 77", placement: "contact", labelMode: "mark", labelIcon: "phone" },
+      { id: "email", key: "email", label: "E-mail", value: "zhaoyang.sui@ut-capitole.fr", placement: "contact", labelMode: "mark", labelIcon: "email" }
+    ],
+    summary: "",
     education: [
       {
-        id: "edu-1",
-        organization: "Université Jiao Tong de Shanghai",
-        role: "Licence en informatique et technologies",
-        location: "Shanghai",
-        startDate: "2019-09",
-        endDate: "2023-06",
-        highlights: ["GPA 3.8/4.0", "Diplômé d'excellence"]
+        id: "edu-miage",
+        organization: "Université Toulouse 1 Capitole",
+        role: "Année préparatoire pour entrer en Master MIAGE",
+        location: "Toulouse, France",
+        startDate: "Septembre 2025",
+        endDate: "Présent",
+        highlights: []
+      },
+      {
+        id: "edu-shnu",
+        organization: "Université normale de Shanghai",
+        role: "Licence en Informatique",
+        location: "Shanghai, Chine",
+        startDate: "Octobre 2020",
+        endDate: "Juin 2024",
+        highlights: ["Moyenne : 76,13/100"]
       }
     ],
     experience: [
       {
-        id: "exp-1",
-        organization: "Entreprise technologique",
-        role: "Ingénieur logiciel backend",
+        id: "exp-zhunshi",
+        organization: "Shanghai Zhunshi Intelligent Information Technology Co., Ltd.",
+        role: "Ingénieur de développement C++",
         location: "Shanghai",
-        startDate: "2023-07",
-        endDate: "Aujourd'hui",
+        startDate: "Mai 2023",
+        endDate: "Décembre 2023",
         highlights: [
-          "Développement d'API centrales du système de commandes, avec plus d'un million de requêtes quotidiennes.",
-          "Réduction de la latence P95 des endpoints clés de 420 ms à 180 ms.",
-          "Conception d'une stratégie de cache Redis réduisant la pression de lecture en pic sur la base de données."
+          "Développement d'algorithmes de conversion de formats de fichiers .xml et .xsd avec récursivité et la conversion intégrée de Visual Studio.",
+          "Développement indépendant du site web de l'entreprise avec React, Node.js, Nginx, etc."
         ]
-      }
-    ],
-    projects: [
-      {
-        id: "project-1",
-        name: "Générateur de CV en ligne",
-        role: "Développeur full-stack",
-        url: "https://example.com",
-        techStack: "Next.js, TypeScript, LaTeX, PostgreSQL",
-        highlights: [
-          "Conception d'un format Resume JSON structuré et génération du code LaTeX via un moteur de templates.",
-          "Mise en place de l'API de compilation et préparation d'un worker XeLaTeX conteneurisé."
-        ]
-      }
-    ],
-    skills: [
-      {
-        id: "skill-1",
-        category: "Langages de programmation",
-        items: ["TypeScript", "Java", "Python"]
       },
       {
-        id: "skill-2",
-        category: "Bases de données",
-        items: ["PostgreSQL", "Redis", "MySQL"]
+        id: "exp-lankuaikei",
+        organization: "Shanghai Lankuaikei Technology Development Co., Ltd.",
+        role: "Ingénieur de test",
+        location: "Shanghai",
+        startDate: "Juillet 2022",
+        endDate: "Septembre 2022",
+        highlights: ["Test de logiciels pour grands écrans et mobiles, et rédaction de la documentation de test."]
       }
     ],
-    awards: [
+    academic: [
       {
-        id: "award-1",
-        title: "Premier prix, concours ACM du campus",
-        issuer: "Université Jiao Tong de Shanghai",
-        date: "2022"
+        id: "academic-hcii-2025",
+        title: "New Objects, New Methods, and New Verifications Bie-modernist Cultural Computing on Contemporary South Korean Literary Works",
+        authors: "Zhaoyang SUI et al.",
+        venue: "HCII 2025",
+        publicationStatus: "Article de conférence publié",
+        date: "Janvier 2025",
+        doi: "",
+        url: "",
+        contribution: "Mise à niveau de l'implémentation technique",
+        highlights: ["Responsable de l'implémentation technique pour l'amélioration des travaux de 2024."]
+      },
+      {
+        id: "academic-hcii-2024",
+        title: "Bie-Modernism Cultural Computing of Literary Works of \"Three Musketeers of Tie Xi\" Based on the Pre-trained Dialogue Models ChatGLM3",
+        authors: "Zhaoyang SUI et al.",
+        venue: "HCII 2024",
+        publicationStatus: "Article de conférence publié",
+        date: "Janvier 2024",
+        doi: "",
+        url: "",
+        contribution: "Programmation du fine-tuning LLM",
+        highlights: [
+          "Programmation pour le fine-tuning des grands modèles de langage.",
+          "Entraînement de modèles avec P-Tuning v2 sur 46 romans chinois pour classifier des concepts littéraires complexes."
+        ]
+      },
+      {
+        id: "academic-wcee-2024",
+        title: "Intelligent Damage Recognition of Timber Structure Connections Based on X-ray Digital Radiography Method",
+        authors: "Zhaoyang SUI et al.",
+        venue: "WCEE 2024",
+        publicationStatus: "Article de conférence publié",
+        date: "Avril 2023",
+        doi: "",
+        url: "",
+        contribution: "Programmation et conception algorithmique",
+        highlights: [
+          "Responsable de la programmation et de la conception des algorithmes.",
+          "Implémentation avec YOLO-v8 et des algorithmes fondamentaux, notamment la croissance de région."
+        ]
       }
-    ]
+    ],
+    projects: [],
+    skills: [
+      {
+        id: "skill-languages",
+        category: "Langues",
+        items: ["Chinois : langue maternelle", "Anglais : B1+", "Français : B1+"]
+      },
+      {
+        id: "skill-computing",
+        category: "Informatique",
+        items: [
+          "Programmation avec des langages avancés : C/C++, Python, Java, R, SQL",
+          "Déploiement de systèmes Linux",
+          "Deep learning, fine-tuning des grands modèles de langage et RAG",
+          "Développement web : React, Node.js, Nginx"
+        ]
+      }
+    ],
+    awards: []
   })
 };
 

@@ -4,7 +4,9 @@ The MVP stores browser drafts in local storage and saved versions in `.data/resu
 
 `ResumeData.language` marks the content version and currently accepts `zh-CN`, `en`, or `fr`; missing legacy values default to `zh-CN` during validation and draft hydration.
 
-`ResumeData.theme.accentColor` stores the user-selected CV accent color. `ResumeData.sections` stores visible CV section IDs, display names, and order. `ResumeData.basicFields` stores the editable basic-information fields shown in the CV; canonical fields can still sync back to the legacy `basics` object for compatibility. Each basic field may also store `placement`, `labelMode`, `labelIcon`, and `labelMark` so the same data can render as the name, a headline line, a contact-line item, or be hidden, with text labels, built-in icon marks, custom marks, or no label.
+`ResumeData.theme.accentColor` stores the user-selected CV accent color. `ResumeData.sections` stores visible CV section IDs, display names, and order, including the dedicated `academic` section for publications and academic work. `ResumeData.basicFields` stores the editable basic-information fields shown in the CV; canonical fields can still sync back to the legacy `basics` object for compatibility. Each basic field may also store `placement`, `labelMode`, `labelIcon`, and `labelMark` so the same data can render as the name, a headline line, a contact-line item, or be hidden, with text labels, built-in icon marks, custom marks, or no label.
+
+Academic entries live in `ResumeData.academic` and store `title`, `authors`, `venue`, `publicationStatus`, `date`, optional `doi`, optional `url`, `contribution`, and bullet `highlights`.
 
 Inline text styling is stored directly in string fields with lightweight markers such as `[[b]]...[[/b]]`, `[[i]]...[[/i]]`, `[[u]]...[[/u]]`, and `[[s]]...[[/s]]`. Preview rendering, browser PDF rendering, and LaTeX export parse those markers into bold, italic, underline, and strikethrough output.
 

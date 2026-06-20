@@ -364,6 +364,61 @@ button {
   gap: 10px;
 }
 
+.collapsible-card {
+  display: block;
+  overflow: hidden;
+  padding: 0;
+}
+
+.collapsible-card > summary {
+  cursor: pointer;
+  justify-content: flex-start;
+  list-style: none;
+  min-width: 0;
+  padding: 12px;
+}
+
+.collapsible-card > summary::-webkit-details-marker {
+  display: none;
+}
+
+.collapsible-card > summary::before {
+  border: solid var(--muted);
+  border-width: 0 1.5px 1.5px 0;
+  content: "";
+  flex: 0 0 auto;
+  height: 7px;
+  margin-right: 2px;
+  transform: rotate(-45deg);
+  transition: transform 120ms ease;
+  width: 7px;
+}
+
+.collapsible-card[open] > summary::before {
+  transform: rotate(45deg);
+}
+
+.collapsible-card > summary > strong {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.collapsible-card > summary .row-actions {
+  margin-left: auto;
+}
+
+.collapsible-card-body {
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+}
+
+.collapsible-card.compact .collapsible-card-body {
+  gap: 10px;
+}
+
 .card-actions {
   align-items: center;
   display: flex;
@@ -595,144 +650,9 @@ button {
   display: inline-block;
   flex: 0 0 auto;
   height: 0.95em;
-  position: relative;
-  top: 0.12em;
+  min-width: 0.95em;
+  vertical-align: -0.12em;
   width: 0.95em;
-}
-
-.basic-field-icon.icon-email {
-  border: 1.4px solid currentColor;
-  border-radius: 2px;
-  height: 0.68em;
-  top: 0.08em;
-}
-
-.basic-field-icon.icon-email::before,
-.basic-field-icon.icon-email::after {
-  border-bottom: 1.2px solid currentColor;
-  content: "";
-  left: 0.12em;
-  position: absolute;
-  top: 0.14em;
-  width: 0.46em;
-}
-
-.basic-field-icon.icon-email::before {
-  transform: rotate(32deg);
-  transform-origin: left center;
-}
-
-.basic-field-icon.icon-email::after {
-  left: auto;
-  right: 0.12em;
-  transform: rotate(-32deg);
-  transform-origin: right center;
-}
-
-.basic-field-icon.icon-phone {
-  border: 1.5px solid currentColor;
-  border-radius: 0.2em;
-  height: 0.9em;
-  transform: rotate(-18deg);
-  width: 0.52em;
-}
-
-.basic-field-icon.icon-phone::after {
-  background: currentColor;
-  border-radius: 999px;
-  bottom: 0.08em;
-  content: "";
-  height: 0.08em;
-  left: 50%;
-  position: absolute;
-  transform: translateX(-50%);
-  width: 0.16em;
-}
-
-.basic-field-icon.icon-location {
-  border: 1.5px solid currentColor;
-  border-radius: 50% 50% 50% 0;
-  height: 0.78em;
-  top: 0.16em;
-  transform: rotate(-45deg);
-  width: 0.78em;
-}
-
-.basic-field-icon.icon-location::after {
-  background: currentColor;
-  border-radius: 999px;
-  content: "";
-  height: 0.18em;
-  left: 50%;
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 0.18em;
-}
-
-.basic-field-icon.icon-website {
-  border: 1.4px solid currentColor;
-  border-radius: 999px;
-}
-
-.basic-field-icon.icon-website::before {
-  border-left: 1.2px solid currentColor;
-  border-right: 1.2px solid currentColor;
-  border-radius: 999px;
-  content: "";
-  inset: 0.08em 0.28em;
-  position: absolute;
-}
-
-.basic-field-icon.icon-website::after {
-  border-top: 1.2px solid currentColor;
-  content: "";
-  left: 0.1em;
-  position: absolute;
-  right: 0.1em;
-  top: 50%;
-}
-
-.basic-field-icon.icon-github,
-.basic-field-icon.icon-linkedin {
-  border: 1.3px solid currentColor;
-  border-radius: 2px;
-  font-family: Arial, sans-serif;
-  font-size: 0.72em;
-  font-weight: 800;
-  height: 1.25em;
-  line-height: 1.12em;
-  text-align: center;
-  top: 0.06em;
-  width: 1.25em;
-}
-
-.basic-field-icon.icon-github::before {
-  content: "GH";
-  letter-spacing: -0.04em;
-}
-
-.basic-field-icon.icon-linkedin::before {
-  content: "in";
-}
-
-.basic-field-icon.icon-link {
-  border: 1.4px solid currentColor;
-  border-radius: 999px;
-  height: 0.46em;
-  transform: rotate(-35deg);
-  width: 0.75em;
-}
-
-.basic-field-icon.icon-link::before {
-  border: 1.4px solid currentColor;
-  border-radius: 999px;
-  content: "";
-  height: 0.46em;
-  left: 0.36em;
-  position: absolute;
-  top: -0.08em;
-  width: 0.75em;
 }
 
 .resume-contact-item span {
@@ -748,6 +668,11 @@ button {
   display: grid;
   gap: 7px;
   margin-top: 12px;
+}
+
+.resume-section.academic-section {
+  gap: 5px;
+  margin-top: 10px;
 }
 
 .resume-section h2 {
@@ -790,6 +715,10 @@ button {
   gap: 5px;
 }
 
+.academic-entry {
+  gap: 3px;
+}
+
 .entry-head {
   align-items: start;
   display: grid;
@@ -797,9 +726,24 @@ button {
   grid-template-columns: minmax(0, 1fr) max-content;
 }
 
+.academic-entry .entry-head {
+  gap: 8px;
+}
+
 .entry-head > div {
   display: grid;
   gap: 2px;
+}
+
+.academic-entry .entry-head strong {
+  font-size: 0.96em;
+  hyphens: auto;
+  line-height: 1.28;
+  overflow-wrap: anywhere;
+}
+
+.academic-entry .entry-head span {
+  line-height: 1.32;
 }
 
 .entry-head span,
@@ -818,6 +762,11 @@ button {
   margin: 1px 0;
   padding-left: 0.9em;
   position: relative;
+}
+
+.academic-entry .resume-bullets li {
+  font-size: 0.96em;
+  margin: 0;
 }
 
 .resume-bullets li::before {
@@ -879,6 +828,14 @@ button {
     grid-template-columns: 1fr;
   }
 
+  .toolbar-actions {
+    justify-content: stretch;
+  }
+
+  .toolbar-actions .button {
+    flex: 1 1 128px;
+  }
+
   .language-tab,
   .template-tab {
     border-bottom: 1px solid var(--line);
@@ -895,12 +852,43 @@ button {
   }
 
   .side-nav nav {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    display: flex;
+    overflow-x: auto;
   }
 
   .side-nav nav button {
     border-bottom: 1px solid var(--line);
+    flex: 0 0 auto;
+    min-width: 88px;
     text-align: center;
+  }
+
+  .editor-section {
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .stack-list {
+    gap: 10px;
+  }
+
+  .collapsible-card > summary {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding: 10px;
+  }
+
+  .collapsible-card > summary > strong {
+    flex: 1 1 150px;
+  }
+
+  .collapsible-card > summary .row-actions {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .collapsible-card-body {
+    padding: 10px;
   }
 
   .field-grid,

@@ -20,6 +20,7 @@ import {
 } from "@/lib/resume-language";
 import { getTemplate, normalizeTemplateId, unifiedTemplateId } from "@/lib/templates";
 import type {
+  AcademicItem,
   BasicField,
   BasicFieldLabelIcon,
   Basics,
@@ -33,9 +34,10 @@ import type {
   TimelineItem
 } from "@/types/resume";
 
-type SectionId = "presentation" | "basics" | "summary" | "experience" | "projects" | "education" | "skills" | "source";
+type SectionId = "presentation" | "basics" | "summary" | "experience" | "academic" | "projects" | "education" | "skills" | "source";
 
 const storageKey = "resume-tex-draft-v1";
+const sampleDraftVersion = "zhaoyang-academic-v3";
 const previewPageWidth = 820;
 const previewPageHeight = 1159.7;
 const previewScreenScale = 0.745;
@@ -53,6 +55,42 @@ function textToLines(value: string): string[] {
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean);
+}
+
+function isLegacyBundledSample(resume: Partial<ResumeData>): boolean {
+  const basics = resume.basics;
+  const basicFields = Array.isArray(resume.basicFields) ? resume.basicFields : [];
+  const experience = Array.isArray(resume.experience) ? resume.experience : [];
+  const projects = Array.isArray(resume.projects) ? resume.projects : [];
+  const academic = Array.isArray(resume.academic) ? resume.academic : [];
+  const searchable = [
+    basics?.name,
+    basics?.email,
+    basics?.github,
+    basics?.website,
+    ...basicFields.flatMap((field) => [field.label, field.value]),
+    ...experience.flatMap((item) => [item.organization, item.role]),
+    ...projects.flatMap((item) => [item.name, item.url])
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  if (
+    searchable.includes("张三") ||
+    searchable.includes("Zhang San") ||
+    searchable.includes("zhangsan@example.com") ||
+    searchable.includes("github.com/example") ||
+    searchable.includes("某科技公司")
+  ) {
+    return true;
+  }
+
+  return Boolean(
+    basics?.name === "Zhaoyang SUI" &&
+      basics?.email === "zhaoyang.sui@ut-capitole.fr" &&
+      academic.some((item) => item.title?.includes("Bie-Modernism")) &&
+      academic.some((item) => !item.authors && !item.publicationStatus && !item.contribution)
+  );
 }
 
 export function ResumeBuilder() {
@@ -74,6 +112,7 @@ export function ResumeBuilder() {
     { id: "basics", label: copy.tabs.basics },
     { id: "summary", label: copy.tabs.summary },
     { id: "experience", label: copy.tabs.experience },
+    { id: "academic", label: copy.tabs.academic },
     { id: "projects", label: copy.tabs.projects },
     { id: "education", label: copy.tabs.education },
     { id: "skills", label: copy.tabs.skills },
@@ -102,21 +141,24 @@ export function ResumeBuilder() {
 
     try {
       const parsed = JSON.parse(saved) as {
+        draftVersion?: string;
         resume?: ResumeData;
         templateId?: string;
         resumeId?: string;
         currentVersionId?: string;
       };
+      const refreshBundledSample = Boolean(parsed.resume && parsed.draftVersion !== sampleDraftVersion && isLegacyBundledSample(parsed.resume));
       if (parsed.resume) {
-        setResume(normalizeResumeLanguage(parsed.resume));
+        const language = getResumeLanguage(parsed.resume);
+        setResume(refreshBundledSample ? sampleResumes[language] : normalizeResumeLanguage(parsed.resume));
       }
       if (parsed.templateId) {
         setTemplateId(normalizeTemplateId(parsed.templateId));
       }
-      if (parsed.resumeId) {
+      if (!refreshBundledSample && parsed.resumeId) {
         setResumeId(parsed.resumeId);
       }
-      if (parsed.currentVersionId) {
+      if (!refreshBundledSample && parsed.currentVersionId) {
         setCurrentVersionId(parsed.currentVersionId);
       }
     } catch {
@@ -131,7 +173,7 @@ export function ResumeBuilder() {
       return;
     }
 
-    window.localStorage.setItem(storageKey, JSON.stringify({ resume, templateId, resumeId, currentVersionId }));
+    window.localStorage.setItem(storageKey, JSON.stringify({ draftVersion: sampleDraftVersion, resume, templateId, resumeId, currentVersionId }));
   }, [currentVersionId, isHydrated, resume, resumeId, templateId]);
 
   function handleLanguageChange(language: ResumeLanguage) {
@@ -146,6 +188,18 @@ export function ResumeBuilder() {
     setCompileState("idle");
     setResumeId(null);
     setCurrentVersionId(null);
+  }
+
+  function resetToSample(language: ResumeLanguage = activeLanguage) {
+    setResume(sampleResumes[language]);
+    setSourceOverride(null);
+    setPdfUrl(null);
+    setCompiledFingerprint(null);
+    setCompileState("idle");
+    setResumeId(null);
+    setCurrentVersionId(null);
+    setTemplateId(unifiedTemplateId);
+    setActiveSection("basics");
   }
 
   async function handleCompile() {
@@ -236,6 +290,9 @@ export function ResumeBuilder() {
           </div>
         </div>
         <div className="toolbar-actions">
+          <button className="button secondary" onClick={() => resetToSample()} type="button">
+            {copy.buttons.resetSample}
+          </button>
           <button className="button secondary" onClick={exportTex} type="button">
             {copy.buttons.exportTex}
           </button>
@@ -293,6 +350,7 @@ export function ResumeBuilder() {
               title={copy.editor.experience}
             />
           ) : null}
+          {activeSection === "academic" ? <AcademicEditor copy={copy} resume={resume} setResume={setResume} /> : null}
           {activeSection === "projects" ? <ProjectsEditor copy={copy} resume={resume} setResume={setResume} /> : null}
           {activeSection === "education" ? (
             <TimelineEditor
@@ -600,23 +658,27 @@ function PresentationEditor({ copy, resume, setResume }: EditorProps) {
       </div>
       <div className="stack-list">
         {resume.sections.map((section, index) => (
-          <div className="item-card compact section-config-card" key={section.id}>
-            <div className="card-actions">
-              <label className="check-field">
-                <input checked={section.visible} onChange={(event) => updateSection(index, { visible: event.target.checked })} type="checkbox" />
-                <span>{copy.editor.showSection}</span>
-              </label>
-              <div className="row-actions">
+          <CollapsibleCard
+            actions={
+              <>
+                <label className="check-field">
+                  <input checked={section.visible} onChange={(event) => updateSection(index, { visible: event.target.checked })} type="checkbox" />
+                  <span>{copy.editor.showSection}</span>
+                </label>
                 <button className="button secondary small" disabled={index === 0} onClick={() => moveSection(index, -1)} type="button">
                   {copy.buttons.moveUp}
                 </button>
                 <button className="button secondary small" disabled={index === resume.sections.length - 1} onClick={() => moveSection(index, 1)} type="button">
                   {copy.buttons.moveDown}
                 </button>
-              </div>
-            </div>
+              </>
+            }
+            compact
+            key={section.id}
+            title={section.title || copy.editor.sectionName}
+          >
             <Field label={copy.editor.sectionName} onChange={(value) => updateSection(index, { title: value })} value={section.title} />
-          </div>
+          </CollapsibleCard>
         ))}
       </div>
     </EditorSection>
@@ -643,7 +705,9 @@ function BasicsEditor({ copy, resume, setResume }: EditorProps) {
     { label: copy.editor.iconWebsite, value: "website" },
     { label: copy.editor.iconGithub, value: "github" },
     { label: copy.editor.iconLinkedin, value: "linkedin" },
-    { label: copy.editor.iconLink, value: "link" }
+    { label: copy.editor.iconLink, value: "link" },
+    { label: copy.editor.iconAge, value: "age" },
+    { label: copy.editor.iconNationality, value: "nationality" }
   ];
   const updateField = (index: number, patch: Partial<BasicField>) => {
     const basicFields = resume.basicFields.map((field, fieldIndex) => (fieldIndex === index ? { ...field, ...patch } : field));
@@ -674,10 +738,9 @@ function BasicsEditor({ copy, resume, setResume }: EditorProps) {
           const showIconSelect = labelMode === "mark";
           const showMarkInput = labelMode === "custom";
           return (
-            <div className="item-card compact" key={field.id}>
-              <div className="card-actions">
-                <strong>{field.label || copy.editor.customField}</strong>
-                <div className="row-actions">
+            <CollapsibleCard
+              actions={
+                <>
                   <button className="button secondary small" disabled={index === 0} onClick={() => moveField(index, -1)} type="button">
                     {copy.buttons.moveUp}
                   </button>
@@ -687,8 +750,12 @@ function BasicsEditor({ copy, resume, setResume }: EditorProps) {
                   <button className="link-button" onClick={() => removeField(index)} type="button">
                     {copy.buttons.delete}
                   </button>
-                </div>
-              </div>
+                </>
+              }
+              compact
+              key={field.id}
+              title={field.label || copy.editor.customField}
+            >
               <div className="field-grid">
                 <Field label={copy.editor.fieldLabel} onChange={(value) => updateField(index, { label: value })} value={field.label} />
                 <Field copy={copy} label={copy.editor.fieldValue} onChange={(value) => updateField(index, { value })} richText value={field.value} />
@@ -720,7 +787,7 @@ function BasicsEditor({ copy, resume, setResume }: EditorProps) {
                   />
                 ) : null}
               </div>
-            </div>
+            </CollapsibleCard>
           );
         })}
       </div>
@@ -765,6 +832,32 @@ type EditorProps = {
   resume: ResumeData;
   setResume: (resume: ResumeData) => void;
 };
+
+function CollapsibleCard({
+  title,
+  actions,
+  children,
+  compact = false
+}: {
+  title: string;
+  actions?: React.ReactNode;
+  children: React.ReactNode;
+  compact?: boolean;
+}) {
+  return (
+    <details className={`item-card collapsible-card${compact ? " compact" : ""}`} open>
+      <summary className="card-actions">
+        <strong>{title}</strong>
+        {actions ? (
+          <div className="row-actions" onClick={(event) => event.stopPropagation()}>
+            {actions}
+          </div>
+        ) : null}
+      </summary>
+      <div className="collapsible-card-body">{children}</div>
+    </details>
+  );
+}
 
 function EditorSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -836,13 +929,15 @@ function TimelineEditor({
       <SectionTitleField copy={copy} resume={resume} sectionId={field === "experience" ? "experience" : "education"} setResume={setResume} />
       <div className="stack-list">
         {items.map((item, index) => (
-          <div className="item-card" key={item.id}>
-            <div className="card-actions">
-              <strong>{item.organization || title}</strong>
+          <CollapsibleCard
+            actions={
               <button className="link-button" onClick={() => removeItem(index)} type="button">
                 {copy.buttons.delete}
               </button>
-            </div>
+            }
+            key={item.id}
+            title={item.organization || title}
+          >
             <div className="field-grid">
               <Field copy={copy} label={copy.editor.organization} onChange={(value) => updateItem(index, { organization: value })} richText value={item.organization} />
               <Field copy={copy} label={copy.editor.role} onChange={(value) => updateItem(index, { role: value })} richText value={item.role} />
@@ -858,11 +953,86 @@ function TimelineEditor({
                 value={linesToText(item.highlights)}
               />
             </div>
-          </div>
+          </CollapsibleCard>
         ))}
       </div>
       <button className="button secondary wide" onClick={() => setResume({ ...resume, [field]: [...items, emptyItem()] })} type="button">
         {addLabel}
+      </button>
+    </EditorSection>
+  );
+}
+
+function AcademicEditor({ copy, resume, setResume }: EditorProps) {
+  const updateItem = (index: number, patch: Partial<AcademicItem>) => {
+    const academic = resume.academic.map((item, itemIndex) => (itemIndex === index ? { ...item, ...patch } : item));
+    setResume({ ...resume, academic });
+  };
+
+  return (
+    <EditorSection title={copy.editor.academic}>
+      <SectionTitleField copy={copy} resume={resume} sectionId="academic" setResume={setResume} />
+      <div className="stack-list">
+        {resume.academic.map((item, index) => (
+          <CollapsibleCard
+            actions={
+              <button
+                className="link-button"
+                onClick={() => setResume({ ...resume, academic: resume.academic.filter((_, itemIndex) => itemIndex !== index) })}
+                type="button"
+              >
+                {copy.buttons.delete}
+              </button>
+            }
+            key={item.id}
+            title={item.title || copy.editor.academicFallback}
+          >
+            <div className="field-grid">
+              <Field copy={copy} label={copy.editor.academicTitle} onChange={(value) => updateItem(index, { title: value })} richText value={item.title} />
+              <Field copy={copy} label={copy.editor.academicAuthors} onChange={(value) => updateItem(index, { authors: value })} richText value={item.authors} />
+              <Field copy={copy} label={copy.editor.academicVenue} onChange={(value) => updateItem(index, { venue: value })} richText value={item.venue} />
+              <Field copy={copy} label={copy.editor.academicStatus} onChange={(value) => updateItem(index, { publicationStatus: value })} richText value={item.publicationStatus} />
+              <Field label={copy.editor.academicDate} onChange={(value) => updateItem(index, { date: value })} value={item.date} />
+              <Field label={copy.editor.academicDoi} onChange={(value) => updateItem(index, { doi: value })} value={item.doi} />
+              <Field label={copy.editor.academicUrl} onChange={(value) => updateItem(index, { url: value })} value={item.url} />
+              <Field copy={copy} label={copy.editor.academicContribution} onChange={(value) => updateItem(index, { contribution: value })} richText value={item.contribution} />
+              <TextAreaField
+                copy={copy}
+                label={copy.editor.highlights}
+                onChange={(value) => updateItem(index, { highlights: textToLines(value) })}
+                richText
+                rows={5}
+                value={linesToText(item.highlights)}
+              />
+            </div>
+          </CollapsibleCard>
+        ))}
+      </div>
+      <button
+        className="button secondary wide"
+        onClick={() =>
+          setResume({
+            ...resume,
+            academic: [
+              ...resume.academic,
+              {
+                id: createId("academic"),
+                title: copy.editor.newAcademicTitle,
+                authors: "",
+                venue: copy.editor.newAcademicVenue,
+                publicationStatus: copy.editor.newAcademicStatus,
+                date: "",
+                doi: "",
+                url: "",
+                contribution: copy.editor.newAcademicContribution,
+                highlights: [copy.editor.newAcademicBullet]
+              }
+            ]
+          })
+        }
+        type="button"
+      >
+        {copy.editor.addAcademic}
       </button>
     </EditorSection>
   );
@@ -879,9 +1049,8 @@ function ProjectsEditor({ copy, resume, setResume }: EditorProps) {
       <SectionTitleField copy={copy} resume={resume} sectionId="projects" setResume={setResume} />
       <div className="stack-list">
         {resume.projects.map((item, index) => (
-          <div className="item-card" key={item.id}>
-            <div className="card-actions">
-              <strong>{item.name || copy.editor.projectFallback}</strong>
+          <CollapsibleCard
+            actions={
               <button
                 className="link-button"
                 onClick={() => setResume({ ...resume, projects: resume.projects.filter((_, itemIndex) => itemIndex !== index) })}
@@ -889,7 +1058,10 @@ function ProjectsEditor({ copy, resume, setResume }: EditorProps) {
               >
                 {copy.buttons.delete}
               </button>
-            </div>
+            }
+            key={item.id}
+            title={item.name || copy.editor.projectFallback}
+          >
             <div className="field-grid">
               <Field copy={copy} label={copy.editor.projectName} onChange={(value) => updateItem(index, { name: value })} richText value={item.name} />
               <Field copy={copy} label={copy.editor.projectRole} onChange={(value) => updateItem(index, { role: value })} richText value={item.role} />
@@ -904,7 +1076,7 @@ function ProjectsEditor({ copy, resume, setResume }: EditorProps) {
                 value={linesToText(item.highlights)}
               />
             </div>
-          </div>
+          </CollapsibleCard>
         ))}
       </div>
       <button
@@ -941,9 +1113,8 @@ function SkillsEditor({ copy, resume, setResume }: EditorProps) {
       <SectionTitleField copy={copy} resume={resume} sectionId="skillsAwards" setResume={setResume} />
       <div className="stack-list">
         {resume.skills.map((group, index) => (
-          <div className="item-card compact" key={group.id}>
-            <div className="card-actions">
-              <strong>{group.category || copy.editor.skillFallback}</strong>
+          <CollapsibleCard
+            actions={
               <button
                 className="link-button"
                 onClick={() => setResume({ ...resume, skills: resume.skills.filter((_, itemIndex) => itemIndex !== index) })}
@@ -951,12 +1122,16 @@ function SkillsEditor({ copy, resume, setResume }: EditorProps) {
               >
                 {copy.buttons.delete}
               </button>
-            </div>
+            }
+            compact
+            key={group.id}
+            title={group.category || copy.editor.skillFallback}
+          >
             <div className="field-grid">
               <Field copy={copy} label={copy.editor.skillCategory} onChange={(value) => updateSkill(index, { category: value })} richText value={group.category} />
               <Field copy={copy} label={copy.editor.skillItems} onChange={(value) => updateSkill(index, { items: value.split(",").map((item) => item.trim()) })} richText value={group.items.join(", ")} />
             </div>
-          </div>
+          </CollapsibleCard>
         ))}
       </div>
       <button
@@ -971,9 +1146,8 @@ function SkillsEditor({ copy, resume, setResume }: EditorProps) {
       </div>
       <div className="stack-list">
         {resume.awards.map((award, index) => (
-          <div className="item-card compact" key={award.id}>
-            <div className="card-actions">
-              <strong>{award.title || copy.editor.awardFallback}</strong>
+          <CollapsibleCard
+            actions={
               <button
                 className="link-button"
                 onClick={() => setResume({ ...resume, awards: resume.awards.filter((_, itemIndex) => itemIndex !== index) })}
@@ -981,13 +1155,17 @@ function SkillsEditor({ copy, resume, setResume }: EditorProps) {
               >
                 {copy.buttons.delete}
               </button>
-            </div>
+            }
+            compact
+            key={award.id}
+            title={award.title || copy.editor.awardFallback}
+          >
             <div className="field-grid">
               <Field copy={copy} label={copy.editor.awardTitle} onChange={(value) => updateAward(index, { title: value })} richText value={award.title} />
               <Field copy={copy} label={copy.editor.awardIssuer} onChange={(value) => updateAward(index, { issuer: value })} richText value={award.issuer} />
               <Field label={copy.editor.awardDate} onChange={(value) => updateAward(index, { date: value })} value={award.date} />
             </div>
-          </div>
+          </CollapsibleCard>
         ))}
       </div>
       <button

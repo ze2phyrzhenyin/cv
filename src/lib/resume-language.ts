@@ -1,4 +1,5 @@
 import type {
+  AcademicItem,
   BasicField,
   BasicFieldLabelIcon,
   BasicFieldLabelMode,
@@ -16,6 +17,7 @@ type ResumeCopy = {
   basics: string;
   summary: string;
   experience: string;
+  academic: string;
   projects: string;
   education: string;
   skillsAwards: string;
@@ -46,6 +48,7 @@ type AppCopy = {
     addField: string;
     moveUp: string;
     moveDown: string;
+    resetSample: string;
     resetSource: string;
   };
   logs: {
@@ -57,6 +60,7 @@ type AppCopy = {
     basics: string;
     summary: string;
     experience: string;
+    academic: string;
     projects: string;
     education: string;
     skills: string;
@@ -96,6 +100,8 @@ type AppCopy = {
     iconGithub: string;
     iconLinkedin: string;
     iconLink: string;
+    iconAge: string;
+    iconNationality: string;
     customField: string;
     summary: string;
     summaryLabel: string;
@@ -104,6 +110,22 @@ type AppCopy = {
     newExperienceOrg: string;
     newExperienceRole: string;
     newExperienceBullet: string;
+    academic: string;
+    academicTitle: string;
+    academicAuthors: string;
+    academicVenue: string;
+    academicStatus: string;
+    academicDate: string;
+    academicDoi: string;
+    academicUrl: string;
+    academicContribution: string;
+    academicFallback: string;
+    addAcademic: string;
+    newAcademicTitle: string;
+    newAcademicVenue: string;
+    newAcademicStatus: string;
+    newAcademicContribution: string;
+    newAcademicBullet: string;
     education: string;
     addEducation: string;
     newEducationOrg: string;
@@ -146,8 +168,8 @@ type AppCopy = {
   compilingBanner: string;
 };
 
-type ResumeLike = Omit<ResumeData, "language" | "theme" | "sections" | "basicFields"> &
-  Partial<Pick<ResumeData, "language" | "theme" | "sections" | "basicFields">>;
+type ResumeLike = Omit<ResumeData, "language" | "theme" | "sections" | "basicFields" | "academic"> &
+  Partial<Pick<ResumeData, "language" | "theme" | "sections" | "basicFields" | "academic">>;
 
 export const resumeLanguages: ResumeLanguage[] = ["zh-CN", "en", "fr"];
 
@@ -159,7 +181,7 @@ export const languageLabels: Record<ResumeLanguage, string> = {
 
 export const defaultAccentColor = "#0f766e";
 
-export const resumeSectionIds: ResumeSectionId[] = ["basics", "summary", "experience", "projects", "education", "skillsAwards"];
+export const resumeSectionIds: ResumeSectionId[] = ["basics", "summary", "experience", "academic", "projects", "education", "skillsAwards"];
 
 const resumeCopy: Record<ResumeLanguage, ResumeCopy> = {
   "zh-CN": {
@@ -167,6 +189,7 @@ const resumeCopy: Record<ResumeLanguage, ResumeCopy> = {
     basics: "基本信息",
     summary: "简介",
     experience: "工作",
+    academic: "学术经历",
     projects: "项目",
     education: "教育",
     skillsAwards: "技能/奖项",
@@ -182,6 +205,7 @@ const resumeCopy: Record<ResumeLanguage, ResumeCopy> = {
     basics: "Basic Info",
     summary: "Summary",
     experience: "Work",
+    academic: "Academic Experience",
     projects: "Projects",
     education: "Education",
     skillsAwards: "Skills/Awards",
@@ -197,6 +221,7 @@ const resumeCopy: Record<ResumeLanguage, ResumeCopy> = {
     basics: "Infos de base",
     summary: "Profil",
     experience: "Expérience",
+    academic: "Expérience académique",
     projects: "Projets",
     education: "Formation",
     skillsAwards: "Compétences/Prix",
@@ -282,6 +307,7 @@ const appCopy: Record<ResumeLanguage, AppCopy> = {
       addField: "新增字段",
       moveUp: "上移",
       moveDown: "下移",
+      resetSample: "恢复示例",
       resetSource: "重置为模板源码"
     },
     logs: {
@@ -293,6 +319,7 @@ const appCopy: Record<ResumeLanguage, AppCopy> = {
       basics: "基本信息",
       summary: "简介",
       experience: "工作",
+      academic: "学术",
       projects: "项目",
       education: "教育",
       skills: "技能/奖项",
@@ -332,6 +359,8 @@ const appCopy: Record<ResumeLanguage, AppCopy> = {
       iconGithub: "GitHub 图案",
       iconLinkedin: "LinkedIn 图案",
       iconLink: "链接图案",
+      iconAge: "年龄图案",
+      iconNationality: "国籍图案",
       customField: "自定义字段",
       summary: "个人简介",
       summaryLabel: "简介",
@@ -340,6 +369,22 @@ const appCopy: Record<ResumeLanguage, AppCopy> = {
       newExperienceOrg: "公司名称",
       newExperienceRole: "职位",
       newExperienceBullet: "负责的业务、动作和结果。",
+      academic: "学术经历",
+      academicTitle: "论文/成果",
+      academicAuthors: "作者",
+      academicVenue: "会议/期刊",
+      academicStatus: "发表状态",
+      academicDate: "日期",
+      academicDoi: "DOI",
+      academicUrl: "链接",
+      academicContribution: "个人贡献",
+      academicFallback: "学术经历",
+      addAcademic: "新增学术经历",
+      newAcademicTitle: "论文或成果名称",
+      newAcademicVenue: "会议/期刊",
+      newAcademicStatus: "投稿/录用/已发表",
+      newAcademicContribution: "个人贡献",
+      newAcademicBullet: "说明研究贡献、技术实现或结果。",
       education: "教育经历",
       addEducation: "新增教育经历",
       newEducationOrg: "学校",
@@ -400,6 +445,7 @@ const appCopy: Record<ResumeLanguage, AppCopy> = {
       addField: "Add field",
       moveUp: "Move up",
       moveDown: "Move down",
+      resetSample: "Reset sample",
       resetSource: "Reset to template source"
     },
     logs: {
@@ -411,6 +457,7 @@ const appCopy: Record<ResumeLanguage, AppCopy> = {
       basics: "Basic Info",
       summary: "Summary",
       experience: "Work",
+      academic: "Academic",
       projects: "Projects",
       education: "Education",
       skills: "Skills/Awards",
@@ -450,6 +497,8 @@ const appCopy: Record<ResumeLanguage, AppCopy> = {
       iconGithub: "GitHub icon",
       iconLinkedin: "LinkedIn icon",
       iconLink: "Link icon",
+      iconAge: "Age icon",
+      iconNationality: "Nationality icon",
       customField: "Custom field",
       summary: "Professional Summary",
       summaryLabel: "Summary",
@@ -458,6 +507,22 @@ const appCopy: Record<ResumeLanguage, AppCopy> = {
       newExperienceOrg: "Company",
       newExperienceRole: "Role",
       newExperienceBullet: "Describe the responsibility, action, and result.",
+      academic: "Academic Experience",
+      academicTitle: "Paper / work",
+      academicAuthors: "Authors",
+      academicVenue: "Conference / journal",
+      academicStatus: "Publication status",
+      academicDate: "Date",
+      academicDoi: "DOI",
+      academicUrl: "Link",
+      academicContribution: "Contribution",
+      academicFallback: "Academic item",
+      addAcademic: "Add academic experience",
+      newAcademicTitle: "Paper or work title",
+      newAcademicVenue: "Conference / journal",
+      newAcademicStatus: "Submitted / accepted / published",
+      newAcademicContribution: "Personal contribution",
+      newAcademicBullet: "Describe the research contribution, implementation, or result.",
       education: "Education",
       addEducation: "Add education",
       newEducationOrg: "School",
@@ -518,6 +583,7 @@ const appCopy: Record<ResumeLanguage, AppCopy> = {
       addField: "Ajouter un champ",
       moveUp: "Monter",
       moveDown: "Descendre",
+      resetSample: "Exemple",
       resetSource: "Réinitialiser le code source"
     },
     logs: {
@@ -529,6 +595,7 @@ const appCopy: Record<ResumeLanguage, AppCopy> = {
       basics: "Infos",
       summary: "Profil",
       experience: "Expérience",
+      academic: "Académique",
       projects: "Projets",
       education: "Formation",
       skills: "Compétences/Prix",
@@ -568,6 +635,8 @@ const appCopy: Record<ResumeLanguage, AppCopy> = {
       iconGithub: "Icône GitHub",
       iconLinkedin: "Icône LinkedIn",
       iconLink: "Icône lien",
+      iconAge: "Icône âge",
+      iconNationality: "Icône nationalité",
       customField: "Champ personnalisé",
       summary: "Profil",
       summaryLabel: "Profil",
@@ -576,6 +645,22 @@ const appCopy: Record<ResumeLanguage, AppCopy> = {
       newExperienceOrg: "Entreprise",
       newExperienceRole: "Poste",
       newExperienceBullet: "Décrivez la responsabilité, l'action et le résultat.",
+      academic: "Expérience académique",
+      academicTitle: "Article / travail",
+      academicAuthors: "Auteurs",
+      academicVenue: "Conférence / revue",
+      academicStatus: "Statut",
+      academicDate: "Date",
+      academicDoi: "DOI",
+      academicUrl: "Lien",
+      academicContribution: "Contribution",
+      academicFallback: "Expérience académique",
+      addAcademic: "Ajouter une expérience académique",
+      newAcademicTitle: "Titre de l'article ou du travail",
+      newAcademicVenue: "Conférence / revue",
+      newAcademicStatus: "Soumis / accepté / publié",
+      newAcademicContribution: "Contribution personnelle",
+      newAcademicBullet: "Décrivez la contribution, l'implémentation ou le résultat.",
       education: "Formation",
       addEducation: "Ajouter une formation",
       newEducationOrg: "École",
@@ -708,7 +793,8 @@ export function normalizeResumeLanguage(resume: ResumeLike): ResumeData {
     theme: normalizeTheme(resume.theme),
     sections: normalizeSections(resume.sections, language),
     basicFields,
-    basics: syncedBasics
+    basics: syncedBasics,
+    academic: normalizeAcademicItems(resume.academic)
   };
 }
 
@@ -773,6 +859,25 @@ function normalizeBasicFields(fields: BasicField[], basics: Basics, language: Re
   });
 }
 
+function normalizeAcademicItems(items: ResumeLike["academic"]): AcademicItem[] {
+  if (!Array.isArray(items)) {
+    return [];
+  }
+
+  return items.map((item, index) => ({
+    id: item.id || `academic-${index}`,
+    title: item.title ?? "",
+    authors: item.authors ?? "",
+    venue: item.venue ?? "",
+    publicationStatus: item.publicationStatus ?? "",
+    date: item.date ?? "",
+    doi: item.doi ?? "",
+    url: item.url ?? "",
+    contribution: item.contribution ?? "",
+    highlights: Array.isArray(item.highlights) ? item.highlights : []
+  }));
+}
+
 function syncBasicsFromFields(basics: Basics, fields: BasicField[]): Basics {
   return fields.reduce(
     (next, field) => {
@@ -820,5 +925,15 @@ function isBasicFieldLabelMode(value: unknown): value is BasicFieldLabelMode {
 }
 
 function isBasicFieldLabelIcon(value: unknown): value is BasicFieldLabelIcon {
-  return value === "email" || value === "phone" || value === "location" || value === "website" || value === "github" || value === "linkedin" || value === "link";
+  return (
+    value === "email" ||
+    value === "phone" ||
+    value === "location" ||
+    value === "website" ||
+    value === "github" ||
+    value === "linkedin" ||
+    value === "link" ||
+    value === "age" ||
+    value === "nationality"
+  );
 }

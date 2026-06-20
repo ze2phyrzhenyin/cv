@@ -8,7 +8,7 @@ export const templateIdSchema = z.string().min(1).transform((): TemplateId => un
 
 export const resumeLanguageSchema = z.enum(["zh-CN", "en", "fr"]);
 
-export const resumeSectionIdSchema = z.enum(["basics", "summary", "experience", "projects", "education", "skillsAwards"]);
+export const resumeSectionIdSchema = z.enum(["basics", "summary", "experience", "academic", "projects", "education", "skillsAwards"]);
 
 export const basicFieldKeySchema = z.enum(["name", "title", "email", "phone", "location", "website", "github", "linkedin"]);
 
@@ -16,7 +16,7 @@ export const basicFieldPlacementSchema = z.enum(["name", "headline", "contact", 
 
 export const basicFieldLabelModeSchema = z.enum(["text", "mark", "custom", "none"]);
 
-export const basicFieldLabelIconSchema = z.enum(["email", "phone", "location", "website", "github", "linkedin", "link"]);
+export const basicFieldLabelIconSchema = z.enum(["email", "phone", "location", "website", "github", "linkedin", "link", "age", "nationality"]);
 
 export const timelineItemSchema = z.object({
   id: z.string().min(1),
@@ -34,6 +34,19 @@ export const projectItemSchema = z.object({
   role: z.string().default(""),
   url: z.string().default(""),
   techStack: z.string().default(""),
+  highlights: z.array(z.string()).default([])
+});
+
+export const academicItemSchema = z.object({
+  id: z.string().min(1),
+  title: z.string().min(1),
+  authors: z.string().default(""),
+  venue: z.string().default(""),
+  publicationStatus: z.string().default(""),
+  date: z.string().default(""),
+  doi: z.string().default(""),
+  url: z.string().default(""),
+  contribution: z.string().default(""),
   highlights: z.array(z.string()).default([])
 });
 
@@ -81,6 +94,7 @@ export const resumeDataSchema = z
     summary: z.string().default(""),
     education: z.array(timelineItemSchema).default([]),
     experience: z.array(timelineItemSchema).default([]),
+    academic: z.array(academicItemSchema).default([]),
     projects: z.array(projectItemSchema).default([]),
     skills: z
       .array(

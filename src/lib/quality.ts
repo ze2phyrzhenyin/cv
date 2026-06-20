@@ -46,6 +46,7 @@ export function analyzeResume(resume: ResumeData): QualityIssue[] {
 
   const allHighlights = [
     ...data.experience.flatMap((item) => item.highlights),
+    ...data.academic.flatMap((item) => item.highlights),
     ...data.projects.flatMap((item) => item.highlights)
   ].filter(Boolean);
 
