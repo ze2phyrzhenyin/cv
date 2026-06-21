@@ -5,7 +5,10 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "ResumeTeX",
-  description: "Structured LaTeX resume builder MVP"
+  description: "Structured LaTeX resume builder MVP",
+  icons: {
+    icon: [{ url: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/favicon.svg`, type: "image/svg+xml" }]
+  }
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

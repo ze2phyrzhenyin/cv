@@ -35,6 +35,15 @@ describe("preview layout", () => {
     expect(htmlPdfSource).not.toContain("line-height: 1.42 !important");
   });
 
+  it("declares a ResumeTeX favicon for base-path deployments", () => {
+    const layoutSource = readFileSync("src/app/layout.tsx", "utf-8");
+    const faviconSource = readFileSync("public/favicon.svg", "utf-8");
+
+    expect(layoutSource).toContain("NEXT_PUBLIC_BASE_PATH");
+    expect(layoutSource).toContain("/favicon.svg");
+    expect(faviconSource).toContain("lucide-react file-text");
+  });
+
   it("compiles pasted LaTeX source through the LaTeX worker path", () => {
     const compilerSource = readFileSync("src/server/compile/compiler.ts", "utf-8");
 
