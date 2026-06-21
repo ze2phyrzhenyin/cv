@@ -62,8 +62,8 @@ export const sampleResumes: Record<ResumeLanguage, ResumeData> = {
         startDate: "2023年5月",
         endDate: "2023年12月",
         highlights: [
-          "开发 .xml/.xsd 格式转换算法，结合递归与 Visual Studio 转换功能。",
-          "独立开发公司网站，使用 React、Node.js、Nginx。"
+          "开发 .xml 和 .xsd 文件格式转换算法，使用递归并结合 Visual Studio 内置转换功能。",
+          "独立开发公司网站，技术栈包括 React、Node.js、Nginx 等。"
         ]
       },
       {
@@ -87,7 +87,7 @@ export const sampleResumes: Record<ResumeLanguage, ResumeData> = {
         doi: "",
         url: "",
         contribution: "技术实现升级",
-        highlights: []
+        highlights: ["负责 2024 年相关工作的技术实现升级。"]
       },
       {
         id: "academic-hcii-2024",
@@ -99,7 +99,10 @@ export const sampleResumes: Record<ResumeLanguage, ResumeData> = {
         doi: "",
         url: "",
         contribution: "大语言模型微调编程",
-        highlights: ["基于 46 部中文小说训练 P-Tuning v2 模型，用于文学概念分类。"]
+        highlights: [
+          "负责大语言模型微调相关编程工作。",
+          "使用 P-Tuning v2 基于 46 部中文小说训练模型，用于复杂文学概念分类。"
+        ]
       },
       {
         id: "academic-wcee-2024",
@@ -111,7 +114,10 @@ export const sampleResumes: Record<ResumeLanguage, ResumeData> = {
         doi: "",
         url: "",
         contribution: "程序开发与算法设计",
-        highlights: []
+        highlights: [
+          "负责程序开发与算法设计。",
+          "使用 YOLO-v8 与区域生长等基础算法完成实现。"
+        ]
       }
     ],
     projects: [],
@@ -125,10 +131,10 @@ export const sampleResumes: Record<ResumeLanguage, ResumeData> = {
         id: "skill-computing",
         category: "信息技术",
         items: [
-          "C/C++、Python、Java、R、SQL",
-          "Linux 部署",
-          "深度学习、LLM 微调、RAG",
-          "React、Node.js、Nginx"
+          "高级语言编程：C/C++、Python、Java、R、SQL",
+          "Linux 系统部署",
+          "深度学习、大语言模型微调与 RAG",
+          "Web 开发：React、Node.js、Nginx"
         ]
       }
     ],
@@ -194,8 +200,8 @@ export const sampleResumes: Record<ResumeLanguage, ResumeData> = {
         startDate: "May 2023",
         endDate: "December 2023",
         highlights: [
-          "Developed .xml/.xsd conversion algorithms with recursion and Visual Studio conversion tooling.",
-          "Built the company website with React, Node.js, and Nginx."
+          "Developed .xml and .xsd file-format conversion algorithms using recursion and Visual Studio's built-in conversion feature.",
+          "Independently developed the company website with React, Node.js, Nginx, and related tooling."
         ]
       },
       {
@@ -219,7 +225,7 @@ export const sampleResumes: Record<ResumeLanguage, ResumeData> = {
         doi: "",
         url: "",
         contribution: "Technical implementation upgrade",
-        highlights: []
+        highlights: ["Responsible for the technical implementation of improvements to the 2024 work."]
       },
       {
         id: "academic-hcii-2024",
@@ -231,7 +237,10 @@ export const sampleResumes: Record<ResumeLanguage, ResumeData> = {
         doi: "",
         url: "",
         contribution: "LLM fine-tuning programming",
-        highlights: ["Trained P-Tuning v2 models on 46 Chinese novels for literary concept classification."]
+        highlights: [
+          "Programmed the fine-tuning workflow for large language models.",
+          "Trained P-Tuning v2 models on 46 Chinese novels to classify complex literary concepts."
+        ]
       },
       {
         id: "academic-wcee-2024",
@@ -243,7 +252,10 @@ export const sampleResumes: Record<ResumeLanguage, ResumeData> = {
         doi: "",
         url: "",
         contribution: "Programming and algorithm design",
-        highlights: []
+        highlights: [
+          "Responsible for programming and algorithm design.",
+          "Implemented the method with YOLO-v8 and fundamental algorithms including region growing."
+        ]
       }
     ],
     projects: [],
@@ -257,10 +269,10 @@ export const sampleResumes: Record<ResumeLanguage, ResumeData> = {
         id: "skill-computing",
         category: "Technical Skills",
         items: [
-          "C/C++, Python, Java, R, SQL",
-          "Linux deployment",
-          "Deep learning, LLM fine-tuning, RAG",
-          "React, Node.js, Nginx"
+          "Advanced programming: C/C++, Python, Java, R, SQL",
+          "Linux system deployment",
+          "Deep learning, LLM fine-tuning, and RAG",
+          "Web development: React, Node.js, Nginx"
         ]
       }
     ],
@@ -326,8 +338,8 @@ export const sampleResumes: Record<ResumeLanguage, ResumeData> = {
         startDate: "Mai 2023",
         endDate: "Décembre 2023",
         highlights: [
-          "Conversion .xml/.xsd avec récursivité et outils Visual Studio.",
-          "Développement du site web de l'entreprise avec React, Node.js et Nginx."
+          "Développement d'algorithmes de conversion de formats de fichiers .xml et .xsd avec récursivité et la conversion intégrée de Visual Studio.",
+          "Développement indépendant du site web de l'entreprise avec React, Node.js, Nginx, etc."
         ]
       },
       {
@@ -351,7 +363,7 @@ export const sampleResumes: Record<ResumeLanguage, ResumeData> = {
         doi: "",
         url: "",
         contribution: "Mise à niveau de l'implémentation technique",
-        highlights: []
+        highlights: ["Responsable de l'implémentation technique pour l'amélioration des travaux de 2024."]
       },
       {
         id: "academic-hcii-2024",
@@ -363,7 +375,10 @@ export const sampleResumes: Record<ResumeLanguage, ResumeData> = {
         doi: "",
         url: "",
         contribution: "Programmation du fine-tuning LLM",
-        highlights: ["Entraînement P-Tuning v2 sur 46 romans chinois pour classifier des concepts littéraires."]
+        highlights: [
+          "Programmation pour le fine-tuning des grands modèles de langage.",
+          "Entraînement de modèles avec P-Tuning v2 sur 46 romans chinois pour classifier des concepts littéraires complexes."
+        ]
       },
       {
         id: "academic-wcee-2024",
@@ -375,7 +390,10 @@ export const sampleResumes: Record<ResumeLanguage, ResumeData> = {
         doi: "",
         url: "",
         contribution: "Programmation et conception algorithmique",
-        highlights: []
+        highlights: [
+          "Responsable de la programmation et de la conception des algorithmes.",
+          "Implémentation avec YOLO-v8 et des algorithmes fondamentaux, notamment la croissance de région."
+        ]
       }
     ],
     projects: [],
@@ -389,10 +407,10 @@ export const sampleResumes: Record<ResumeLanguage, ResumeData> = {
         id: "skill-computing",
         category: "Informatique",
         items: [
-          "C/C++, Python, Java, R, SQL",
-          "Linux",
-          "Deep learning, fine-tuning LLM, RAG",
-          "React, Node.js, Nginx"
+          "Programmation avec des langages avancés : C/C++, Python, Java, R, SQL",
+          "Déploiement de systèmes Linux",
+          "Deep learning, fine-tuning des grands modèles de langage et RAG",
+          "Développement web : React, Node.js, Nginx"
         ]
       }
     ],

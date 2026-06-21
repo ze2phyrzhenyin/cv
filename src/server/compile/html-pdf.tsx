@@ -98,9 +98,11 @@ body {
 }
 
 .resume-page {
+  aspect-ratio: auto !important;
   box-shadow: none !important;
   max-width: none !important;
   min-height: ${pdfHeightPx}px;
+  overflow: visible !important;
   width: ${pdfWidthPx}px !important;
 }
     </style>

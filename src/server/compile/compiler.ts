@@ -3,10 +3,13 @@ import { access, copyFile, mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { spawn } from "node:child_process";
 
+import { generateLatex } from "../../lib/latex";
+import { getTemplate } from "../../lib/templates";
 import { artifactPdfPath, workspacePath } from "./paths";
 import { readCompileJob, updateCompileJob } from "./job-store";
 import { attachCompilePdf } from "../resumes/store";
 import { renderResumePdf } from "./html-pdf";
+import type { CompileJobRecord } from "./types";
 
 type CommandResult = {
   code: number | null;
@@ -39,7 +42,7 @@ export async function processCompileJob(jobId: string): Promise<void> {
     await mkdir(buildDir, { recursive: true });
     await writeFile(path.join(workspace, "main.tex"), job.sourceTex, "utf-8");
 
-    const mode = compileMode();
+    const mode = compileMode(job);
     const log =
       mode === "browser" ? await renderResumePdf(job, outputPdf, workspace) : await compileLatexToPdf(workspace, mode);
 
@@ -67,14 +70,26 @@ export async function processCompileJob(jobId: string): Promise<void> {
   }
 }
 
-function compileMode(): "browser" | "local" | "docker" {
+function compileMode(job: CompileJobRecord): "browser" | "local" | "docker" {
   if (process.env.RESUME_TEX_COMPILE_MODE === "docker") {
     return "docker";
   }
   if (process.env.RESUME_TEX_COMPILE_MODE === "local") {
     return "local";
   }
+  if (hasManualLatexSource(job)) {
+    return "local";
+  }
   return "browser";
+}
+
+function hasManualLatexSource(job: CompileJobRecord): boolean {
+  const generatedSource = generateLatex(job.resume, getTemplate(job.templateId));
+  return normalizeLatexSource(job.sourceTex) !== normalizeLatexSource(generatedSource);
+}
+
+function normalizeLatexSource(source: string): string {
+  return source.replace(/\s+/g, " ").trim();
 }
 
 async function compileLatexToPdf(workspace: string, mode: "local" | "docker"): Promise<string> {

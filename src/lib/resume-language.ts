@@ -49,6 +49,9 @@ type AppCopy = {
     addField: string;
     moveUp: string;
     moveDown: string;
+    copyPrompt: string;
+    copiedPrompt: string;
+    downloadPrompt: string;
     resetSample: string;
     resetSource: string;
   };
@@ -162,6 +165,10 @@ type AppCopy = {
     addAward: string;
     newAwardTitle: string;
     newAwardIssuer: string;
+    aiPrompt: string;
+    latexSource: string;
+    latexPromptHint: string;
+    latexSourceHint: string;
     source: string;
   };
   draftBanner: string;
@@ -309,6 +316,9 @@ const appCopy: Record<ResumeLanguage, AppCopy> = {
       addField: "新增字段",
       moveUp: "上移",
       moveDown: "下移",
+      copyPrompt: "复制提示词",
+      copiedPrompt: "已复制",
+      downloadPrompt: "下载提示词",
       resetSample: "恢复示例",
       resetSource: "重置为模板源码"
     },
@@ -422,6 +432,10 @@ const appCopy: Record<ResumeLanguage, AppCopy> = {
       addAward: "新增奖项",
       newAwardTitle: "奖项名称",
       newAwardIssuer: "颁发机构",
+      aiPrompt: "AI LaTeX 提示词",
+      latexSource: "LaTeX 源码",
+      latexPromptHint: "把提示词和你的简历信息交给 AI，要求只返回完整 .tex。",
+      latexSourceHint: "粘贴 AI 返回的完整 .tex，然后点击生成 PDF。",
       source: "LaTeX 源码"
     },
     draftBanner: "当前显示草稿",
@@ -448,6 +462,9 @@ const appCopy: Record<ResumeLanguage, AppCopy> = {
       addField: "Add field",
       moveUp: "Move up",
       moveDown: "Move down",
+      copyPrompt: "Copy prompt",
+      copiedPrompt: "Copied",
+      downloadPrompt: "Download prompt",
       resetSample: "Reset sample",
       resetSource: "Reset to template source"
     },
@@ -561,6 +578,10 @@ const appCopy: Record<ResumeLanguage, AppCopy> = {
       addAward: "Add award",
       newAwardTitle: "Award name",
       newAwardIssuer: "Issuer",
+      aiPrompt: "AI LaTeX prompt",
+      latexSource: "LaTeX Source",
+      latexPromptHint: "Send the prompt and your resume facts to your AI, asking it to return only a complete .tex file.",
+      latexSourceHint: "Paste the complete .tex returned by AI, then generate the PDF.",
       source: "LaTeX Source"
     },
     draftBanner: "Showing draft",
@@ -587,6 +608,9 @@ const appCopy: Record<ResumeLanguage, AppCopy> = {
       addField: "Ajouter un champ",
       moveUp: "Monter",
       moveDown: "Descendre",
+      copyPrompt: "Copier prompt",
+      copiedPrompt: "Copié",
+      downloadPrompt: "Télécharger prompt",
       resetSample: "Exemple",
       resetSource: "Réinitialiser le code source"
     },
@@ -700,6 +724,10 @@ const appCopy: Record<ResumeLanguage, AppCopy> = {
       addAward: "Ajouter un prix",
       newAwardTitle: "Nom du prix",
       newAwardIssuer: "Organisme",
+      aiPrompt: "Prompt IA LaTeX",
+      latexSource: "Source LaTeX",
+      latexPromptHint: "Envoyez le prompt et vos informations de CV à votre IA, avec sortie .tex complète uniquement.",
+      latexSourceHint: "Collez le .tex complet renvoyé par l'IA, puis générez le PDF.",
       source: "Source LaTeX"
     },
     draftBanner: "Aperçu brouillon",

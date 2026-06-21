@@ -37,7 +37,7 @@ import type {
 type SectionId = "presentation" | "basics" | "summary" | "experience" | "academic" | "projects" | "education" | "skills" | "source";
 
 const storageKey = "resume-tex-draft-v1";
-const sampleDraftVersion = "zhaoyang-academic-v4";
+const sampleDraftVersion = "zhaoyang-academic-v5";
 const previewPageWidth = 820;
 const previewPageHeight = 1159.7;
 const previewScreenScale = 0.745;
@@ -55,6 +55,38 @@ function textToLines(value: string): string[] {
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean);
+}
+
+function buildAiLatexPrompt(resume: ResumeData): string {
+  const data = normalizeResumeLanguage(resume);
+  return [
+    "You are generating a production-ready CV LaTeX source for ResumeTeX.",
+    "",
+    "Return ONLY a complete single-file .tex document. Do not wrap it in Markdown fences. Do not add explanations.",
+    "",
+    "Compilation target:",
+    "- Engine: XeLaTeX via latexmk.",
+    "- Paper: A4.",
+    "- Output should be readable and professional. Prefer one page when the content can fit naturally; if the user has too much content, use two pages instead of making the typography cramped.",
+    "- Use only common TeX Live packages: geometry, fontspec, xcolor, enumitem, hyperref, ulem, tabularx if needed.",
+    "- Do not use minted, shell-escape, external images, remote files, custom fonts that are not guarded with font fallbacks, or packages that require manual asset installation.",
+    "- For Chinese/CJK text, use fontspec fallbacks such as Songti SC, Noto Serif CJK SC, Noto Sans CJK SC, FandolSong-Regular, and TeX Gyre Termes.",
+    "- Keep margins compact but not crowded. Avoid text touching the page bottom.",
+    "- Escape LaTeX special characters in user content.",
+    "",
+    "Visual direction:",
+    "- Minimal technical CV, clean rules, restrained teal accent, strong hierarchy.",
+    "- If contact icons are needed, use standard TeX Live icon packages such as fontawesome5 when available, with text-label fallback. Do not draw custom icons or require external image/SVG files.",
+    "- Long publication titles must wrap cleanly.",
+    "",
+    "User workflow:",
+    "1. Use the resume facts below as the structured source of truth, or replace them with the user's own resume facts.",
+    "2. Produce complete .tex code only.",
+    "3. The generated .tex will be pasted into ResumeTeX and compiled directly.",
+    "",
+    "Resume facts / current example:",
+    JSON.stringify(data, null, 2)
+  ].join("\n");
 }
 
 function isLegacyBundledSample(resume: Partial<ResumeData>): boolean {
@@ -93,7 +125,9 @@ function isLegacyBundledSample(resume: Partial<ResumeData>): boolean {
         searchable.includes("高级语言编程") ||
         searchable.includes("Advanced programming") ||
         searchable.includes("Programmation avec des langages avancés") ||
-        searchable.includes("Développement d'algorithmes de conversion"))
+        searchable.includes("Développement d'algorithmes de conversion") ||
+        searchable.includes("Conversion .xml/.xsd avec récursivité") ||
+        searchable.includes("Deep learning, fine-tuning LLM, RAG"))
   );
 }
 
@@ -125,6 +159,7 @@ export function ResumeBuilder() {
   const template = getTemplate(templateId);
   const generatedTex = useMemo(() => generateLatex(resume, template), [resume, template]);
   const sourceTex = sourceOverride ?? generatedTex;
+  const aiLatexPrompt = useMemo(() => buildAiLatexPrompt(resume), [resume]);
   const currentFingerprint = useMemo(() => JSON.stringify({ resume, sourceTex, templateId }), [resume, sourceTex, templateId]);
   const currentFingerprintRef = useRef(currentFingerprint);
   const pdfIsFresh = Boolean(pdfUrl && compiledFingerprint === currentFingerprint);
@@ -377,7 +412,7 @@ export function ResumeBuilder() {
           ) : null}
           {activeSection === "skills" ? <SkillsEditor copy={copy} resume={resume} setResume={setResume} /> : null}
           {activeSection === "source" ? (
-            <SourceEditor copy={copy} sourceTex={sourceTex} onReset={() => setSourceOverride(null)} onUpdate={setSourceOverride} />
+            <SourceEditor copy={copy} promptText={aiLatexPrompt} sourceTex={sourceTex} onReset={() => setSourceOverride(null)} onUpdate={setSourceOverride} />
           ) : null}
         </section>
 
@@ -1213,21 +1248,91 @@ function SkillsEditor({ copy, resume, setResume }: EditorProps) {
 
 function SourceEditor({
   copy,
+  promptText,
   sourceTex,
   onUpdate,
   onReset
 }: {
   copy: BuilderCopy;
+  promptText: string;
   sourceTex: string;
   onUpdate: (value: string) => void;
   onReset: () => void;
 }) {
+  const [copyState, setCopyState] = useState<"idle" | "copied">("idle");
+
+  async function copyPrompt() {
+    await copyText(promptText);
+    setCopyState("copied");
+    window.setTimeout(() => setCopyState("idle"), 1600);
+  }
+
+  function downloadPrompt() {
+    const blob = new Blob([promptText], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "resume-tex-ai-prompt.txt";
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <EditorSection title={copy.editor.source}>
-      <textarea className="source-editor" onChange={(event) => onUpdate(event.target.value)} spellCheck={false} value={sourceTex} />
-      <button className="button secondary wide" onClick={onReset} type="button">
-        {copy.buttons.resetSource}
-      </button>
+      <div className="source-workflow">
+        <section className="source-card prompt-card">
+          <div className="source-card-head">
+            <div>
+              <strong>{copy.editor.aiPrompt}</strong>
+              <span>{copy.editor.latexPromptHint}</span>
+            </div>
+            <div className="row-actions">
+              <button className="button secondary small" onClick={copyPrompt} type="button">
+                {copyState === "copied" ? copy.buttons.copiedPrompt : copy.buttons.copyPrompt}
+              </button>
+              <button className="button secondary small" onClick={downloadPrompt} type="button">
+                {copy.buttons.downloadPrompt}
+              </button>
+            </div>
+          </div>
+          <textarea className="prompt-editor" readOnly spellCheck={false} value={promptText} />
+        </section>
+
+        <section className="source-card">
+          <div className="source-card-head">
+            <div>
+              <strong>{copy.editor.latexSource}</strong>
+              <span>{copy.editor.latexSourceHint}</span>
+            </div>
+            <button className="button secondary small" onClick={onReset} type="button">
+              {copy.buttons.resetSource}
+            </button>
+          </div>
+          <textarea className="source-editor" onChange={(event) => onUpdate(event.target.value)} spellCheck={false} value={sourceTex} />
+        </section>
+      </div>
     </EditorSection>
   );
+}
+
+async function copyText(value: string): Promise<void> {
+  if (navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(value);
+      return;
+    } catch {
+      // Fall through to the legacy path for non-HTTPS deployments.
+    }
+  }
+
+  const textarea = document.createElement("textarea");
+  textarea.value = value;
+  textarea.setAttribute("readonly", "true");
+  textarea.style.left = "-9999px";
+  textarea.style.position = "fixed";
+  textarea.style.top = "0";
+  document.body.append(textarea);
+  textarea.select();
+  document.execCommand("copy");
+  textarea.remove();
 }
